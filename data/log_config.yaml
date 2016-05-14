@@ -1,0 +1,25 @@
+---
+# Config  for logging Module.
+# --------------------------
+# See http://docs.python.org/2.7/library/logging.config.html#configuration-dictionary-schema
+version: 1
+disable_existing_loggers: true
+handlers:
+  logfile_debug:
+    class: logging.FileHandler
+    filename: ~/.very_hungry_pi/debug.log
+    level: DEBUG
+  logfile_info:
+    class: logging.FileHandler
+    filename: ~/.very_hungry_pi/info.log
+    level: INFO
+  console:
+    class: logging.StreamHandler
+    stream: ext://sys.stdout
+    level: DEBUG
+loggers:
+  main:
+    handlers: [logfile_debug, logfile_info]
+root:
+  level: DEBUG
+  handlers: [console]

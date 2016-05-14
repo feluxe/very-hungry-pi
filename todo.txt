@@ -1,0 +1,20 @@
+
+Was ist eigentlich mit spaces in exclude paths. Das könnte ein Problem sein:
+    rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found --exclude=.cache/chromium --exclude=.mozilla/firefox/*/Cache --exclude=.IntelliJIdea2016.1 --exclude=.config --exclude=.thunderbird /src ...
+
+Packaging
+    create a .deb package that installs easily and puts congif files in home .very_hungry_pi/
+        Use "Open Build Library" to do packaging or create a deb package manually see zim for detail.
+
+
+Dupe deletion function.
+    Get all duplicates file across all snapshots via fdupes.
+        Only files with same permissions, timestamps, etc. are dupes.
+            That is because you can't have them different on from another.
+    Delete all dupes but one, but keep one file.
+        Make hardlinks of that file to the places where the dupes where
+            keep the original name of cause.
+    Add Config to set interval for dupe removal
+
+
+

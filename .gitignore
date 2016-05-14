@@ -1,0 +1,17 @@
+
+.cache/
+venv/
+.env
+__pycache__/
+tests/dummy_dest/
+lock
+
+### Wheels ###
+build/
+dist/
+
+### Intellij ###
+*.iml
+.idea/
+
+debian/
