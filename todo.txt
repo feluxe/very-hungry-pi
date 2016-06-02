@@ -1,4 +1,8 @@
 
+Ggf solltest du über einen async check nachdenken, der auch während der Scriptausführung überprüft, ob die Quelle noch erreichbar ist.
+Ich glaube es kommt zu problemen, wenn der script gerade kopiert, und das Laptop heruntergefahren wird.
+
+
 Was ist eigentlich mit spaces in exclude paths. Das könnte ein Problem sein:
     rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found --exclude=.cache/chromium --exclude=.mozilla/firefox/*/Cache --exclude=.IntelliJIdea2016.1 --exclude=.config --exclude=.thunderbird /src ...
 
