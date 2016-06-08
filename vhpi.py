@@ -11,6 +11,7 @@ import logging.config
 import sys
 import fcntl
 import yaml
+import threading
 
 
 HOME = os.path.expanduser("~")
@@ -166,6 +167,17 @@ def is_machine_online(ip):
         return True
     except subprocess.CalledProcessError:
         return False
+
+
+# Check if source is online repeatedly. If it goes offline exit program.
+def machine_watcher(ip, t):
+    threading.Timer(60.0, machine_watcher(ip, t).start())
+
+    if not is_machine_online(ip):
+        log.job_out(2, t)
+        log.info('    Error: Source went offline: ' +
+                 time.strftime('%Y-%m-%d %H:%M:%S'))
+        sys.exit()
 
 
 # Check if another instance of the script is already running. If so exit.
@@ -348,6 +360,8 @@ def main():
             i2 = 'Due: ' + ', '.join(job.due_snapshots)
             log.out_line([i1, i2])
             continue
+
+        machine_watcher(job.src_ip, t)
 
         log.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' [Executing] ' +
                  job.src + '\n')
