@@ -171,12 +171,12 @@ def is_machine_online(ip):
 
 # Check if source is online repeatedly. If it goes offline exit program.
 def machine_watcher(ip, t):
-    threading.Timer(60.0, machine_watcher(ip, t).start())
+    threading.Timer(60.0, machine_watcher, [ip, t]).start()
 
     if not is_machine_online(ip):
-        log.job_out(2, t)
         log.info('    Error: Source went offline: ' +
                  time.strftime('%Y-%m-%d %H:%M:%S'))
+        log.job_out(2, t)
         sys.exit()
 
 
@@ -195,6 +195,10 @@ def check_lock(lockfile):
 
 # load Yaml
 def load_yaml(file, create_new=False):
+    file_dir = os.path.dirname(file)
+    if not check_path(file_dir) == 'dir':
+        log.critical('    Error: Could not find dir :' + file_dir)
+        sys.exit()
     try:
         with open(file, 'r') as stream:
             output = yaml.safe_load(stream)
