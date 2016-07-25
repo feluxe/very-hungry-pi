@@ -17,6 +17,10 @@ handlers:
     class: logging.StreamHandler
     stream: ext://sys.stdout
     level: DEBUG
+  mail:
+    class: logging.SMTPHandler
+    level: INFO
+    args: ('localhost', 'from@abc', ['felix@meyerwolters.de'], 'Logger Subject')
 loggers:
   main:
     handlers: [logfile_debug, logfile_info]

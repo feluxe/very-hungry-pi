@@ -165,6 +165,7 @@ class Log(object):
         self.logger = self.init_logger(self.name)
 
     # Load log cfg file and initiate logging system.
+    # Add functions to 'logging' class.
     def init_logger(self, name):
         content = ''
         with open(LOG_CFG, 'r') as stream:
@@ -436,5 +437,6 @@ if __name__ == "__main__":
         log.job_out(2, time.time())
         os.killpg(0, signal.SIGKILL) # kill all processes in my group
     except Exception:
+        log.error('    Error: An Exception was thrown.')
         os.killpg(0, signal.SIGKILL) # kill all processes in my group
-
+        log.job_out(2, time.time())

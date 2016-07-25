@@ -1,7 +1,6 @@
 
 # For more information: https://github.com/feluxe/very_hungry_pi
 app_cfg:
-
   exclude_lib:
     standard_list: [
       lost+found/*,
