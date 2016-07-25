@@ -164,6 +164,7 @@ class Log(object):
         self.name = name
         self.logger = self.init_logger(self.name)
 
+    # Load log cfg file and initiate logging system.
     def init_logger(self, name):
         content = ''
         with open(LOG_CFG, 'r') as stream:
@@ -176,6 +177,8 @@ class Log(object):
         logging.Logger.out_line = self.out_line
         return logging.getLogger(name)
 
+    # Filter a string for words. Each line that contains a word will be logged.
+    # Can be used on the output of rsync to log each line with an 'error' or 'warning'.
     def matching_lines(self, level, needle, lines):
         lines = lines.splitlines()
         matches = ['    ' + level.title() + ': ' + s
@@ -184,6 +187,7 @@ class Log(object):
         dynamic_func = getattr(self.logger, level)
         dynamic_func(matches_str)
 
+    # Log message used when a job ends.
     def job_out(self, code, _t):
         seconds = time.time() - _t
         duration = time.strftime('%H:%M:%S', time.gmtime(seconds))
@@ -277,17 +281,15 @@ def is_due(_type, intervals, timestamp):
     if timestamp == 0 or timestamp == '0' or timestamp == '':
         timestamp = '1970-01-01 00:00:00'
     _format = "%Y-%m-%d %H:%M:%S"
-    timestamp = time.mktime(datetime.datetime.strptime(timestamp,
-                                                       _format).timetuple())
+    timestamp = time.mktime(datetime.datetime.strptime(timestamp, _format).timetuple())
     time_now = int(time.time())
-
     if time_now - cycle_time >= timestamp:
         return True
     else:
         return False
 
 
-# func: check if path exists and return type (file|dir).
+# Check if path exists and return (file|dir| false).
 def check_path(path):
     if not os.path.exists(path):
         return False
@@ -322,6 +324,8 @@ def shift_snaps(dest, due_snapshots, snapshots):
     return True
 
 
+# Create hardlinks from 'backup.latest' to each queried
+#   snapshot dir. E.g. 'hourly.0', 'weekly.0', ...
 def make_hard_links(dest, due_snapshots):
     for snapshot in due_snapshots:
         source = clean_path(dest + '/backup.latest')
@@ -335,6 +339,10 @@ def make_hard_links(dest, due_snapshots):
     return True
 
 
+# Delete all folders that are out of keep range.
+# These are the snapshot folders that contain states that are
+#   older than what the user likes tokeep.
+# The range is defined in config.
 def del_deprecated_snaps(deprecated_dirs):
     for _dir in deprecated_dirs:
         if not check_path(_dir) == False:
@@ -360,10 +368,11 @@ def main():
     cfg_data = load_yaml(CFG)
     app = App(cfg_data)
 
+    # Loop through each job that is defined in the cfg.
     for _id, job_cfg in enumerate(app.jobs):
 
-        job = Job(_id, job_cfg, app)
-        t = time.time()
+        job = Job(_id, job_cfg, app) # Create job instance with job config data.
+        t = time.time() # set initial timestamp
 
         if not job.due_snapshots:
             log.out_line(['[Skipped] No dues for: ' + job.src])
@@ -419,7 +428,7 @@ if __name__ == "__main__":
     log = Log('main')
     log = log.logger
     lock = check_lock(LOCK_FILE)
-    os.setpgrp() # create new process group, become its leader
+    os.setpgrp() # create new process group, become its leader. os.killpg will kill all processes.
     try:
         main()
     except KeyboardInterrupt:
