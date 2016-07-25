@@ -12,6 +12,7 @@ import sys
 import fcntl
 import yaml
 import threading
+import signal
 
 
 HOME = os.path.expanduser("~")
@@ -53,6 +54,7 @@ class Job(object):
                                                       self.dest)
         self.deprecated_dirs = self.get_deprecated_dirs(self.dest,
                                                         self.snapshots)
+        self.rsync_process = None
 
     @staticmethod
     def get_timestamps(dest, intervals):
@@ -116,6 +118,46 @@ class Job(object):
         return deprecated
 
 
+    # Check if source is online repeatedly. If it goes offline exit program.
+    def machine_watcher(self, ip, t):
+        time.sleep(5) # Wait for rsync to run.
+        while self.rsync_process != None:
+            if not is_machine_online(ip):
+                log.info('    Error: Source went offline: ' +
+                    time.strftime('%Y-%m-%d %H:%M:%S'))
+                log.job_out(2, t)
+                self.rsync_process.kill()
+                sys.exit()
+            time.sleep(60)
+
+
+    # execute rsync command.
+    def exec_rsync(self, _command):
+        return_val = None
+        try:
+            log.info('    Executing: ' + ' '.join(_command))
+            self.rsync_process = subprocess.Popen(_command,
+                                 shell=False,
+                                 stdin=subprocess.PIPE,
+                                 stdout=subprocess.PIPE,
+                                 stderr=subprocess.STDOUT,
+                                 close_fds=True,
+                                 universal_newlines=True)
+            output = self.rsync_process.stdout.read()
+            log.debug(output)
+            log.if_in_line('warning', 'rsync: ', output)
+            log.if_in_line('warning', 'rsync error: ', output)
+            log.if_in_line('info', 'bytes/sec', output)
+            log.if_in_line('info', 'total size is ', output)
+            return_val = True
+        except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
+            if e.returncode and e.returncode != 23:
+                log.warning('    Error: Unknown Rsync Exit Code')
+                return_val = False
+        self.rsync_process = None
+        return return_val
+
+
 class Log(object):
 
     def __init__(self, name):
@@ -159,6 +201,9 @@ class Log(object):
         self.logger.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + messages)
 
 
+# Kill Sequence
+
+
 # check if machine is online.
 def is_machine_online(ip):
     ping_command = ["ping", "-c", "1", ip]
@@ -167,17 +212,6 @@ def is_machine_online(ip):
         return True
     except subprocess.CalledProcessError:
         return False
-
-
-# Check if source is online repeatedly. If it goes offline exit program.
-def machine_watcher(ip, t):
-    threading.Timer(60.0, machine_watcher, [ip, t]).start()
-
-    if not is_machine_online(ip):
-        log.info('    Error: Source went offline: ' +
-                 time.strftime('%Y-%m-%d %H:%M:%S'))
-        log.job_out(2, t)
-        sys.exit()
 
 
 # Check if another instance of the script is already running. If so exit.
@@ -266,30 +300,6 @@ def check_path(path):
             return False
 
 
-# execute rsync command.
-def exec_rsync(_command):
-    try:
-        log.info('    Executing: ' + ' '.join(_command))
-        p = subprocess.Popen(_command,
-                             shell=False,
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.STDOUT,
-                             close_fds=True,
-                             universal_newlines=True)
-        output = p.stdout.read()
-        log.debug(output)
-        log.if_in_line('warning', 'rsync: ', output)
-        log.if_in_line('warning', 'rsync error: ', output)
-        log.if_in_line('info', 'bytes/sec', output)
-        log.if_in_line('info', 'total size is ', output)
-    except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
-        if e.returncode and e.returncode != 23:
-            log.warning('    Error: Unknown Rsync Exit Code')
-            return False
-    return True
-
-
 # Increase the dir number by one for each due snapshot.
 # In order to know which dirs need to be changed, the function iterates through
 # the keep-amount that is set by the user.
@@ -365,8 +375,6 @@ def main():
             log.out_line([i1, i2])
             continue
 
-        machine_watcher(job.src_ip, t)
-
         log.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' [Executing] ' +
                  job.src + '\n')
         log.info('    Due: ' + ', '.join(job.due_snapshots))
@@ -379,7 +387,12 @@ def main():
             log.job_out(2, t)
             continue
 
-        if not exec_rsync(job.rsync_command):
+        # Start a watcher in a thread which checks if source machine is online each 60s.
+        t_machine_watcher = threading.Thread(target=job.machine_watcher, args=(job.src_ip, t))
+        t_machine_watcher.setDaemon(True)
+        t_machine_watcher.start()
+
+        if not job.exec_rsync(job.rsync_command):
             log.job_out(2, t)
             continue
 
@@ -406,10 +419,13 @@ if __name__ == "__main__":
     log = Log('main')
     log = log.logger
     lock = check_lock(LOCK_FILE)
-
+    os.setpgrp() # create new process group, become its leader
     try:
         main()
     except KeyboardInterrupt:
         log.error('    Error: Backup aborted by user.')
         log.job_out(2, time.time())
+        os.killpg(0, signal.SIGKILL) # kill all processes in my group
+    except Exception:
+        os.killpg(0, signal.SIGKILL) # kill all processes in my group
 
