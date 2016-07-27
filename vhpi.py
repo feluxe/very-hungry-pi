@@ -305,7 +305,7 @@ def get_deprecated_dirs(dest, snapshot, snapshots):
     base_dir = clean_path(dest + '/' + snapshot + ".")
     keep_range = range(snapshots[snapshot] - 2, -1, -1)
     active = [base_dir + str(num) for num in keep_range]
-    active.append(base_dir + '0.incomplete')
+    active.append(base_dir + '0.tmp')
     deprecated.extend([_dir for _dir in glob.glob(base_dir + '*') if _dir not in active])
     return deprecated
 
@@ -376,7 +376,7 @@ def make_hardlinks(src, dest):
 
 
 def rename_successful_snapshot(old):
-    new = old.replace('.incomplete', '')
+    new = old.replace('.tmp', '')
     output = True
     log.debug_ts_msg('  Renaming snapshot from: '
                      '' + old.split('/')[-1] + ' to: ' + new.split('/')[-1])
@@ -396,7 +396,7 @@ def make_snapshots(base_dest, due_snapshots, snapshots):
     for snapshot in due_snapshots:
         log.debug_ts_msg('Start: processing snapshot: ' + snapshot)
         source = clean_path(base_dest + '/backup.latest')
-        snap_dest = clean_path(base_dest + '/' + snapshot + '.0.incomplete')
+        snap_dest = clean_path(base_dest + '/' + snapshot + '.0.tmp')
         if not remove_incomplete_snapshots(snap_dest):
             continue
         if not make_hardlinks(source, snap_dest):
