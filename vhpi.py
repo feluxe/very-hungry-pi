@@ -143,8 +143,8 @@ class Job(object):
             log.if_in_line('warning', 'rsync error: ', output)
             log.if_in_line('info', 'bytes/sec', output)
             log.if_in_line('info', 'total size is ', output)
-        except (subprocess.SubprocessError, subprocess.CalledProcessError) as _e:
-            if _e.returncode and _e.returncode != 23:
+        except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
+            if e.returncode and e.returncode != 23:
                 log.warning('    Error: Unknown Rsync Exit Code')
                 return_val = False
         self.rsync_process = None
@@ -243,11 +243,11 @@ def load_yaml(file, create_new=False):
             log.critical('    Error: Could not read file :' + file)
             sys.exit()
         output = open(file, 'w+')
-    except IOError as _e:
-        log.critical('    Error: Could not read YAML file.', _e)
+    except IOError as e:
+        log.critical('    Error: Could not read YAML file.', e)
         sys.exit()
-    except yaml.YAMLError as _e:
-        log.critical("    Error: Error in YAML file:", _e)
+    except yaml.YAMLError as e:
+        log.critical("    Error: Error in YAML file:", e)
         sys.exit()
     return output
 
@@ -260,8 +260,8 @@ def write_yaml(data, file):
     except IOError as e:
         log.error('    Error: Could not write to YAML file.', e)
         sys.exit()
-    except yaml.YAMLError as _e:
-        log.error("    Error writing YAML file:", _e)
+    except yaml.YAMLError as e:
+        log.error("    Error writing YAML file:", e)
         sys.exit()
     return True
 
@@ -276,7 +276,7 @@ def is_due(_type, intervals, timestamp):
         log.critical("    Critical: No time interval set for type: " + _type)
         sys.exit()
     cycle_time = intervals[_type]
-    if timestamp == 0 or timestamp == '0' or timestamp == '':
+    if not isinstance(timestamp, str) or not timestamp:
         timestamp = '1970-01-01 00:00:00'
     _format = "%Y-%m-%d %H:%M:%S"
     timestamp = time.mktime(datetime.datetime.strptime(timestamp, _format).timetuple())
@@ -316,14 +316,14 @@ def get_deprecated_dirs(dest, snapshot, snapshots):
 # Delete deprecated snapshot directories.
 def del_deprecated_snaps(dest, snapshot, snapshots):
     return_val = True
-    deprecared = get_deprecated_dirs(dest, snapshot, snapshots)
-    for _dir in deprecared:
+    deprecated = get_deprecated_dirs(dest, snapshot, snapshots)
+    for _dir in deprecated:
         log.debug_ts_msg('  Deleting deprecated snapshot: ' + _dir)
         if check_path(_dir) == 'dir':
             try:
                 subprocess.check_output(['rm', '-rf', str(_dir)])
             except subprocess.CalledProcessError as e:
-                log.debug(_e)
+                log.debug(e)
                 log.error('    Error: Could not delete deprecated snapshot' + _dir)
                 return_val = False
     return return_val
@@ -339,8 +339,8 @@ def shift_snaps(dest, snapshot, snapshots):
         if check_path(raw_path + str(num)) == 'dir':
             try:
                 os.rename(raw_path + str(num), raw_path + str(num + 1))
-            except OSError as _e:
-                log.debug(_e)
+            except OSError as e:
+                log.debug(e)
                 log.critical('    Critical Error: Could not rename dir: '
                              + raw_path + str(num)) + '==> ' + str(num + 1)
                 output = False
@@ -359,8 +359,8 @@ def remove_incomplete_snapshots(dest):
         log.debug_ts_msg('  Removing old incomplete snapshot: ' + dest.split('/')[-1])
         try:
             subprocess.check_output(['rm', '-rf', dest])
-        except subprocess.CalledProcessError as _e:
-            log.debug(_e)
+        except subprocess.CalledProcessError as e:
+            log.debug(e)
             log.critical('    Critical Error: Could not remove : ' + dest)
             output = False
     return output
@@ -371,8 +371,8 @@ def make_hardlinks(src, dest):
     output = True
     try:
         subprocess.check_output(['cp', '-al', src, dest])
-    except subprocess.CalledProcessError as _e:
-        log.debug(_e)
+    except subprocess.CalledProcessError as e:
+        log.debug(e)
         log.error('    Critical Error: Could not make hardlinks for: ' + src)
         output = False
     return output
@@ -385,8 +385,8 @@ def rename_successful_snapshot(old):
                      '' + old.split('/')[-1] + ' to: ' + new.split('/')[-1])
     try:
         subprocess.check_output(['mv', old, new])
-    except subprocess.CalledProcessError as _e:
-        log.debug(_e)
+    except subprocess.CalledProcessError as e:
+        log.debug(e)
         log.critical('    Critical Error: Could not rename dir from: ' + old + ' to: ' + new)
         output = False
     return output
@@ -477,8 +477,8 @@ if __name__ == "__main__":
         log.error('    Error: Backup aborted by user.')
         log.job_out(2, time.time())
         os.killpg(0, signal.SIGKILL)  # kill all processes in my group
-    except Exception as _e:
+    except Exception as e:
         log.error('    Error: An Exception was thrown: ')
-        log.error(_e)
+        log.error(str(e))
         os.killpg(0, signal.SIGKILL)  # kill all processes in my group
         log.job_out(2, time.time())
