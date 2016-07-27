@@ -322,6 +322,8 @@ def shift_snaps(dest, due_snapshots, snapshots):
         for num in range(snapshots[snapshot] - 1, -1, -1):
             if check_path(base_dir + str(num)) == 'dir':
                 try:
+                    log.debug_ts_msg('Shifting: ' + snapshot + str(num) + ' => ' + snapshot
+                                     + str(num + 1))
                     os.rename(base_dir + str(num), base_dir + str(num + 1))
                 except OSError as e:
                     log.debug(e)
@@ -343,6 +345,7 @@ def make_hard_links(dest, due_snapshots):
         source = clean_path(dest + '/backup.latest')
         destination = clean_path(dest + '/' + snapshot + '.0')
         try:
+            log.debug_ts_msg('Making links from: ' + source + ' to ' + snapshot + '.0')
             subprocess.check_output(['cp', '-al', source, destination])
         except subprocess.CalledProcessError as e:
             log.debug(e)
@@ -360,6 +363,7 @@ def del_deprecated_snaps(deprecated_dirs):
     log.debug_ts_msg('Start: delete deprecated snapshots.')
     bool = True
     for _dir in deprecated_dirs:
+        log.debug_ts_msg('Deleting dir: ' + _dir)
         if not check_path(_dir) == False:
             try:
                 shutil.rmtree(str(_dir))
