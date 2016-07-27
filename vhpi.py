@@ -48,8 +48,6 @@ class Job(object):
                                                       self.excludes,
                                                       self.src,
                                                       self.dest)
-        self.deprecated_dirs = self.get_deprecated_dirs(self.dest,
-                                                        self.snapshots)
         self.rsync_process = None
         self.t = None
 
@@ -302,36 +300,40 @@ def check_path(path):
             return False
 
 
-# # Increase the dir number by one for each due snapshot.
-# # In order to know which dirs need to be changed, the function iterates through
-# # the keep-amount that is set by the user.
-# # If a dir does not exist, it is skipped.
-# # Returns all jobs that do not fail the shift.
-# def shift_snaps_old(dest, due_snapshots, snapshots):
-#     log.debug_ts_msg('Start: shift snapshots')
-#     return_val = True
-#     for snapshot in due_snapshots:
-#         base_dir = clean_path(dest + '/' + snapshot + '.')
-#         for num in range(snapshots[snapshot] - 1, -1, -1):
-#             if check_path(base_dir + str(num)) == 'dir':
-#                 try:
-#                     log.debug_ts_msg('Shifting: ' + snapshot + str(num) + ' => ' + snapshot
-#                                      + str(num + 1))
-#                     os.rename(base_dir + str(num), base_dir + str(num + 1))
-#                 except OSError as e:
-#                     log.debug(_e)
-#                     log.error('    Error: Could not rename dir: ' +
-#                               base_dir + str(num)) + '==> ' + str(num + 1)
-#                     log.error('    Error: Could not shift snapshot '
-#                               'directories.')
-#                     return_val = False
-#     log.debug_ts_msg('End: shift snapshots')
-#     return return_val
+# Get all deprecated snapshot dirs.
+# Dirs that contain snapshots that are older than what the user wants to keep.
+# The keep range is defined in config.
+def get_deprecated_dirs(dest, snapshot, snapshots):
+    deprecated = []
+    base_dir = clean_path(dest + '/' + snapshot + ".")
+    keep_range = range(snapshots[snapshot] - 2, -1, -1)
+    active = [base_dir + str(num) for num in keep_range]
+    active.append(base_dir + '0.incomplete')
+    deprecated.extend([_dir for _dir in glob.glob(base_dir + '*') if _dir not in active])
+    return deprecated
+
+
+# Delete deprecated snapshot directories.
+def del_deprecated_snaps(dest, snapshot, snapshots):
+    return_val = True
+    deprecared = get_deprecated_dirs(dest, snapshot, snapshots)
+    for _dir in deprecared:
+        log.debug_ts_msg('  Deleting deprecated snapshot: ' + _dir)
+        if check_path(_dir) == 'dir':
+            try:
+                subprocess.check_output(['rm', '-rf', str(_dir)])
+            except subprocess.CalledProcessError as e:
+                log.debug(_e)
+                log.error('    Error: Could not delete deprecated snapshot' + _dir)
+                return_val = False
+    return return_val
 
 
 # Increase the dir num by one for selected snapshot type.
 # Use the keep amount that is defined in config to find out how many dirs need to be changed.
 def shift_snaps(dest, snapshot, snapshots):
+    log.debug_ts_msg('  Shifting snapshots.')
+    output = True
     raw_path = clean_path(dest + '/' + snapshot + '.')
     for num in range(snapshots[snapshot] - 1, -1, -1):
         if check_path(raw_path + str(num)) == 'dir':
@@ -341,59 +343,79 @@ def shift_snaps(dest, snapshot, snapshots):
                 log.debug(_e)
                 log.critical('    Critical Error: Could not rename dir: '
                              + raw_path + str(num)) + '==> ' + str(num + 1)
-                sys.exit()
+                output = False
+    return output
 
 
 def update_timestamp(dest, snapshot, timestamps):
+    log.debug_ts_msg('  Updating timestamp.')
     timestamps[snapshot] = time.strftime('%Y-%m-%d %H:%M:%S')
     write_yaml(timestamps, clean_path(dest + '/' + TIMESTAMP_FILE))
 
 
-# Create hardlinks from 'backup.latest' to each queried
-#   snapshot dir. E.g. 'hourly.0', 'weekly.0', ...
-def make_snapshots(dest, due_snapshots, snapshots):
-    log.debug_ts_msg('Start: make snapshots.')
-    return_val = True
-    for snapshot in due_snapshots:
-        source = clean_path(dest + '/backup.latest')
-        destination = clean_path(dest + '/' + snapshot + '.0.incomplete')
+def remove_incomplete_snapshots(dest):
+    output = True
+    if check_path(dest) == 'dir':
+        log.debug_ts_msg('  Removing old incomplete snapshot: ' + dest.split('/')[-1])
         try:
-            log.debug_ts_msg('Making links from: ' + source + ' to ' + snapshot + '.0')
-            subprocess.check_output(['rm', '-rf', destination])
-            subprocess.check_output(['cp', '-al', source, destination])
-            time.sleep(3)
-            shift_snaps(dest, snapshot, snapshots)
-            time.sleep(3)
-            # remove '.incomplete' label from destination dir name.
-            subprocess.check_output(['mv', destination, destination.replace('.incomplete', '')])
-            update_timestamp(dest, snapshot, snapshots)
+            subprocess.check_output(['rm', '-rf', dest])
         except subprocess.CalledProcessError as _e:
             log.debug(_e)
-            log.error('    Error: Could not make hardlinks for: ' + dest)
-            return_val = False
+            log.critical('    Critical Error: Could not remove : ' + dest)
+            output = False
+    return output
+
+
+def make_hardlinks(src, dest):
+    log.debug_ts_msg('  Making links from: ' + src.split('/')[-1] + ' to ' + dest.split('/')[-1])
+    output = True
+    try:
+        subprocess.check_output(['cp', '-al', src, dest])
+    except subprocess.CalledProcessError as _e:
+        log.debug(_e)
+        log.error('    Critical Error: Could not make hardlinks for: ' + src)
+        output = False
+    return output
+
+
+def rename_successful_snapshot(old):
+    new = old.replace('.incomplete', '')
+    output = True
+    log.debug_ts_msg('  Renaming snapshot from: '
+                     '' + old.split('/')[-1] + ' to: ' + new.split('/')[-1])
+    try:
+        subprocess.check_output(['mv', old, new])
+    except subprocess.CalledProcessError as _e:
+        log.debug(_e)
+        log.critical('    Critical Error: Could not rename dir from: ' + old + ' to: ' + new)
+        output = False
+    return output
+
+
+# Create hardlinks from 'backup.latest' to each queried
+#   snapshot dir. E.g. 'hourly.0', 'weekly.0', ...
+def make_snapshots(base_dest, due_snapshots, snapshots):
+    output = True
+    for snapshot in due_snapshots:
+        log.debug_ts_msg('Start: processing snapshot: ' + snapshot)
+        source = clean_path(base_dest + '/backup.latest')
+        snap_dest = clean_path(base_dest + '/' + snapshot + '.0.incomplete')
+
+        if not remove_incomplete_snapshots(snap_dest):
             continue
-    log.debug_ts_msg('End: make snapshots.')
-    return return_val
+        if not make_hardlinks(source, snap_dest):
+            continue
+        if not del_deprecated_snaps(base_dest, snapshot, snapshots):
+            continue
+        if not shift_snaps(base_dest, snapshot, snapshots):
+            continue
+        if not rename_successful_snapshot(snap_dest):
+            continue
+        update_timestamp(base_dest, snapshot, snapshots)
+        log.debug_ts_msg('  Successfully created snapshot: ' + snapshot)
+    log.debug_ts_msg('End: processing snapshots.')
+    return output
 
-
-# Delete all folders that are out of keep range.
-# These are the snapshot folders that contain states that are
-#   older than what the user likes to keep.
-# The range is defined in config.
-def del_deprecated_snaps(deprecated_dirs):
-    log.debug_ts_msg('Start: delete deprecated snapshots.')
-    return_val = True
-    for _dir in deprecated_dirs:
-        log.debug_ts_msg('Deleting dir: ' + _dir)
-        if check_path(_dir):
-            try:
-                subprocess.check_output(['rm', '-rf', str(_dir)])
-            except subprocess.CalledProcessError as e:
-                log.debug(_e)
-                log.error('    Error: Could not delete deprecated snapshot ' + _dir)
-                return_val = False
-    log.debug_ts_msg('End: delete deprecated snapshots.')
-    return return_val
 
 
 def main():
@@ -434,10 +456,6 @@ def main():
         t_machine_watcher.start()
 
         if not job.exec_rsync(job.rsync_command):
-            log.job_out(2, job.t)
-            continue
-
-        if not del_deprecated_snaps(job.deprecated_dirs):
             log.job_out(2, job.t)
             continue
 
