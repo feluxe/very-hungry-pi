@@ -391,7 +391,7 @@ def rename_successful_snapshot(old):
 
 # Create hardlinks from 'backup.latest' to each queried
 #   snapshot dir. E.g. 'hourly.0', 'weekly.0', ...
-def make_snapshots(base_dest, due_snapshots, snapshots):
+def make_snapshots(base_dest, due_snapshots, snapshots, timestamps):
     output = True
     for snapshot in due_snapshots:
         log.debug_ts_msg('Start: processing snapshot: ' + snapshot)
@@ -407,7 +407,7 @@ def make_snapshots(base_dest, due_snapshots, snapshots):
             continue
         if not rename_successful_snapshot(snap_dest):
             continue
-        update_timestamp(base_dest, snapshot, snapshots)
+        update_timestamp(base_dest, snapshot, timestamps)
         log.debug_ts_msg('  Successfully created snapshot: ' + snapshot)
     log.debug_ts_msg('End: processing snapshots.')
     return output
@@ -445,7 +445,7 @@ def main():
         if not job.exec_rsync(job.rsync_command):
             log.job_out(2, job.t)
             continue
-        if not make_snapshots(job.dest, job.due_snapshots, job.snapshots):
+        if not make_snapshots(job.dest, job.due_snapshots, job.snapshots, job.timestamps):
             log.job_out(2, job.t)
             continue
         log.job_out(0, job.t)
