@@ -55,6 +55,7 @@ class Job(object):
         self.deprecated_dirs = self.get_deprecated_dirs(self.dest,
                                                         self.snapshots)
         self.rsync_process = None
+        self.t = None
 
     @staticmethod
     def get_timestamps(dest, intervals):
@@ -133,7 +134,8 @@ class Job(object):
 
     # execute rsync command.
     def exec_rsync(self, _command):
-        return_val = None
+        log.debug_ts_msg('Start: rsync execution.')
+        bool = True
         try:
             log.info('    Executing: ' + ' '.join(_command))
             self.rsync_process = subprocess.Popen(_command,
@@ -149,13 +151,13 @@ class Job(object):
             log.if_in_line('warning', 'rsync error: ', output)
             log.if_in_line('info', 'bytes/sec', output)
             log.if_in_line('info', 'total size is ', output)
-            return_val = True
         except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
             if e.returncode and e.returncode != 23:
                 log.warning('    Error: Unknown Rsync Exit Code')
-                return_val = False
+                bool = False
         self.rsync_process = None
-        return return_val
+        log.debug_ts_msg('End: rsync execution.')
+        return bool
 
 
 class Log(object):
@@ -176,6 +178,7 @@ class Log(object):
         logging.Logger.if_in_line = self.matching_lines
         logging.Logger.job_out = self.job_out
         logging.Logger.out_line = self.out_line
+        logging.Logger.debug_ts_msg = self.debug_ts_msg
         return logging.getLogger(name)
 
     # Filter a string for words. Each line that contains a word will be logged.
@@ -204,6 +207,9 @@ class Log(object):
     def out_line(self, messages):
         messages = '; '.join(messages)
         self.logger.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + messages)
+
+    def debug_ts_msg(self, message=''):
+        self.logger.debug('    ' + time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + message)
 
 
 # Kill Sequence
@@ -309,6 +315,8 @@ def check_path(path):
 # If a dir does not exist, it is skipped.
 # Returns all jobs that do not fail the shift.
 def shift_snaps(dest, due_snapshots, snapshots):
+    log.debug_ts_msg('Start: shift snapshots')
+    bool = True
     for snapshot in due_snapshots:
         base_dir = clean_path(dest + '/' + snapshot + '.')
         for num in range(snapshots[snapshot] - 1, -1, -1):
@@ -321,13 +329,16 @@ def shift_snaps(dest, due_snapshots, snapshots):
                               base_dir + str(num)) + '==> ' + str(num + 1)
                     log.error('    Error: Could not shift snapshot '
                               'directories.')
-                    return False
-    return True
+                    bool = False
+    log.debug_ts_msg('End: shift snapshots')
+    return bool
 
 
 # Create hardlinks from 'backup.latest' to each queried
 #   snapshot dir. E.g. 'hourly.0', 'weekly.0', ...
 def make_hard_links(dest, due_snapshots):
+    log.debug_ts_msg('Start: make hardlinks.')
+    bool = True
     for snapshot in due_snapshots:
         source = clean_path(dest + '/backup.latest')
         destination = clean_path(dest + '/' + snapshot + '.0')
@@ -336,8 +347,9 @@ def make_hard_links(dest, due_snapshots):
         except subprocess.CalledProcessError as e:
             log.debug(e)
             log.error('    Error: Could not make hardlinks for: ' + dest)
-            return False
-    return True
+            bool = False
+    log.debug_ts_msg('End: make hardlinks.')
+    return bool
 
 
 # Delete all folders that are out of keep range.
@@ -345,6 +357,8 @@ def make_hard_links(dest, due_snapshots):
 #   older than what the user likes tokeep.
 # The range is defined in config.
 def del_deprecated_snaps(deprecated_dirs):
+    log.debug_ts_msg('Start: delete deprecated snapshots.')
+    bool = True
     for _dir in deprecated_dirs:
         if not check_path(_dir) == False:
             try:
@@ -353,8 +367,9 @@ def del_deprecated_snaps(deprecated_dirs):
                 log.debug(e)
                 log.error('    Error: Could not delete deprecated snapshot ' +
                           _dir)
-                return False
-    return True
+                bool = False
+    log.debug_ts_msg('End: delete deprecated snapshots.')
+    return bool
 
 
 def update_timestamps(dest, due_snapshots, timestamps):
@@ -373,7 +388,7 @@ def main():
     for _id, job_cfg in enumerate(app.jobs):
 
         job = Job(_id, job_cfg, app) # Create job instance with job config data.
-        t = time.time() # set initial timestamp
+        job.t = time.time() # set initial timestamp
 
         if not job.due_snapshots:
             log.out_line(['[Skipped] No dues for: ' + job.src])
@@ -390,39 +405,39 @@ def main():
         log.info('    Due: ' + ', '.join(job.due_snapshots))
 
         if not job.check_valid_file(job.src):
-            log.job_out(2, t)
+            log.job_out(2, job.t)
             continue
 
         if not job.check_dest(job.dest):
-            log.job_out(2, t)
+            log.job_out(2, job.t)
             continue
 
         # Start a watcher in a thread which checks if source machine is online each 60s.
-        t_machine_watcher = threading.Thread(target=job.machine_watcher, args=(job.src_ip, t))
+        t_machine_watcher = threading.Thread(target=job.machine_watcher, args=(job.src_ip, job.t))
         t_machine_watcher.setDaemon(True)
         t_machine_watcher.start()
 
         if not job.exec_rsync(job.rsync_command):
-            log.job_out(2, t)
+            log.job_out(2, job.t)
             continue
 
         if not del_deprecated_snaps(job.deprecated_dirs):
-            log.job_out(2, t)
+            log.job_out(2, job.t)
             continue
 
         if not shift_snaps(job.dest, job.due_snapshots, job.snapshots):
-            log.job_out(2, t)
+            log.job_out(2, job.t)
             continue
 
         if not make_hard_links(job.dest, job.due_snapshots):
-            log.job_out(2, t)
+            log.job_out(2, job.t)
             continue
 
         if not update_timestamps(job.dest, job.due_snapshots, job.timestamps):
-            log.job_out(2, t)
+            log.job_out(2, job.t)
             continue
 
-        log.job_out(0, t)
+        log.job_out(0, job.t)
 
 
 if __name__ == "__main__":
@@ -436,7 +451,8 @@ if __name__ == "__main__":
         log.error('    Error: Backup aborted by user.')
         log.job_out(2, time.time())
         os.killpg(0, signal.SIGKILL) # kill all processes in my group
-    except Exception:
-        log.error('    Error: An Exception was thrown.')
+    except Exception as e:
+        log.error('    Error: An Exception was thrown: ')
+        log.error(e)
         os.killpg(0, signal.SIGKILL) # kill all processes in my group
         log.job_out(2, time.time())
