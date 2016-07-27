@@ -3,7 +3,6 @@
 import os
 import time
 import datetime
-import shutil
 import subprocess
 import glob
 import logging
@@ -13,7 +12,6 @@ import fcntl
 import yaml
 import threading
 import signal
-
 
 HOME = os.path.expanduser("~")
 CFG_DIR = HOME + '/.very_hungry_pi'
@@ -25,7 +23,6 @@ TIMESTAMP_FILE = '.backup_timestamps'
 
 
 class App(object):
-
     def __init__(self, _cfg):
         self.jobs = _cfg['jobs_cfg']
         self.exclude_lib = _cfg['app_cfg']['exclude_lib']
@@ -33,7 +30,6 @@ class App(object):
 
 
 class Job(object):
-
     def __init__(self, job_id, _job_cfg, _app):
         self.id = job_id
         self.src_ip = _job_cfg['source_ip']
@@ -118,50 +114,47 @@ class Job(object):
                                if _dir not in active])
         return deprecated
 
-
     # Check if source is online repeatedly. If it goes offline exit program.
     def machine_watcher(self, ip, t):
-        time.sleep(5) # Wait for rsync to run.
-        while self.rsync_process != None:
+        time.sleep(5)  # Wait for rsync to run.
+        while self.rsync_process:
             if not is_machine_online(ip):
                 log.info('    Error: Source went offline: ' +
-                    time.strftime('%Y-%m-%d %H:%M:%S'))
+                         time.strftime('%Y-%m-%d %H:%M:%S'))
                 log.job_out(2, t)
                 self.rsync_process.kill()
                 sys.exit()
             time.sleep(60)
 
-
     # execute rsync command.
     def exec_rsync(self, _command):
         log.debug_ts_msg('Start: rsync execution.')
-        bool = True
+        return_val = True
         try:
             log.info('    Executing: ' + ' '.join(_command))
             self.rsync_process = subprocess.Popen(_command,
-                                 shell=False,
-                                 stdin=subprocess.PIPE,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT,
-                                 close_fds=True,
-                                 universal_newlines=True)
+                                                  shell=False,
+                                                  stdin=subprocess.PIPE,
+                                                  stdout=subprocess.PIPE,
+                                                  stderr=subprocess.STDOUT,
+                                                  close_fds=True,
+                                                  universal_newlines=True)
             output = self.rsync_process.stdout.read()
             log.debug(output)
             log.if_in_line('warning', 'rsync: ', output)
             log.if_in_line('warning', 'rsync error: ', output)
             log.if_in_line('info', 'bytes/sec', output)
             log.if_in_line('info', 'total size is ', output)
-        except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
-            if e.returncode and e.returncode != 23:
+        except (subprocess.SubprocessError, subprocess.CalledProcessError) as _e:
+            if _e.returncode and _e.returncode != 23:
                 log.warning('    Error: Unknown Rsync Exit Code')
-                bool = False
+                return_val = False
         self.rsync_process = None
         log.debug_ts_msg('End: rsync execution.')
-        return bool
+        return return_val
 
 
 class Log(object):
-
     def __init__(self, name):
         self.name = name
         self.logger = self.init_logger(self.name)
@@ -252,11 +245,11 @@ def load_yaml(file, create_new=False):
             log.critical('    Error: Could not read file :' + file)
             sys.exit()
         output = open(file, 'w+')
-    except IOError as e:
-        log.critical('    Error: Could not read YAML file.', e)
+    except IOError as _e:
+        log.critical('    Error: Could not read YAML file.', _e)
         sys.exit()
-    except yaml.YAMLError as e:
-        log.critical("    Error: Error in YAML file:", e)
+    except yaml.YAMLError as _e:
+        log.critical("    Error: Error in YAML file:", _e)
         sys.exit()
     return output
 
@@ -266,11 +259,11 @@ def write_yaml(data, file):
     try:
         with open(file, 'w') as outfile:
             outfile.write(yaml.dump(data, default_flow_style=True))
-    except IOError:
-        log.error('    Error: Could not write to YAML file.')
+    except IOError as e:
+        log.error('    Error: Could not write to YAML file.', e)
         sys.exit()
-    except yaml.YAMLError as e:
-        log.error("    Error writing YAML file:", e)
+    except yaml.YAMLError as _e:
+        log.error("    Error writing YAML file:", _e)
         sys.exit()
     return True
 
@@ -309,95 +302,109 @@ def check_path(path):
             return False
 
 
-# Increase the dir number by one for each due snapshot.
-# In order to know which dirs need to be changed, the function iterates through
-# the keep-amount that is set by the user.
-# If a dir does not exist, it is skipped.
-# Returns all jobs that do not fail the shift.
-def shift_snaps(dest, due_snapshots, snapshots):
-    log.debug_ts_msg('Start: shift snapshots')
-    bool = True
-    for snapshot in due_snapshots:
-        base_dir = clean_path(dest + '/' + snapshot + '.')
-        for num in range(snapshots[snapshot] - 1, -1, -1):
-            if check_path(base_dir + str(num)) == 'dir':
-                try:
-                    log.debug_ts_msg('Shifting: ' + snapshot + str(num) + ' => ' + snapshot
-                                     + str(num + 1))
-                    os.rename(base_dir + str(num), base_dir + str(num + 1))
-                except OSError as e:
-                    log.debug(e)
-                    log.error('    Error: Could not rename dir: ' +
-                              base_dir + str(num)) + '==> ' + str(num + 1)
-                    log.error('    Error: Could not shift snapshot '
-                              'directories.')
-                    bool = False
-    log.debug_ts_msg('End: shift snapshots')
-    return bool
+# # Increase the dir number by one for each due snapshot.
+# # In order to know which dirs need to be changed, the function iterates through
+# # the keep-amount that is set by the user.
+# # If a dir does not exist, it is skipped.
+# # Returns all jobs that do not fail the shift.
+# def shift_snaps_old(dest, due_snapshots, snapshots):
+#     log.debug_ts_msg('Start: shift snapshots')
+#     return_val = True
+#     for snapshot in due_snapshots:
+#         base_dir = clean_path(dest + '/' + snapshot + '.')
+#         for num in range(snapshots[snapshot] - 1, -1, -1):
+#             if check_path(base_dir + str(num)) == 'dir':
+#                 try:
+#                     log.debug_ts_msg('Shifting: ' + snapshot + str(num) + ' => ' + snapshot
+#                                      + str(num + 1))
+#                     os.rename(base_dir + str(num), base_dir + str(num + 1))
+#                 except OSError as e:
+#                     log.debug(_e)
+#                     log.error('    Error: Could not rename dir: ' +
+#                               base_dir + str(num)) + '==> ' + str(num + 1)
+#                     log.error('    Error: Could not shift snapshot '
+#                               'directories.')
+#                     return_val = False
+#     log.debug_ts_msg('End: shift snapshots')
+#     return return_val
+
+
+# Increase the dir num by one for selected snapshot type.
+# Use the keep amount that is defined in config to find out how many dirs need to be changed.
+def shift_snaps(dest, snapshot, snapshots):
+    raw_path = clean_path(dest + '/' + snapshot + '.')
+    for num in range(snapshots[snapshot] - 1, -1, -1):
+        if check_path(raw_path + str(num)) == 'dir':
+            try:
+                os.rename(raw_path + str(num), raw_path + str(num + 1))
+            except OSError as _e:
+                log.debug(_e)
+                log.critical('    Critical Error: Could not rename dir: '
+                             + raw_path + str(num)) + '==> ' + str(num + 1)
+                sys.exit()
+
+
+def update_timestamp(dest, snapshot, timestamps):
+    timestamps[snapshot] = time.strftime('%Y-%m-%d %H:%M:%S')
+    write_yaml(timestamps, clean_path(dest + '/' + TIMESTAMP_FILE))
 
 
 # Create hardlinks from 'backup.latest' to each queried
 #   snapshot dir. E.g. 'hourly.0', 'weekly.0', ...
-def make_hard_links(dest, due_snapshots):
-    log.debug_ts_msg('Start: make hardlinks.')
-    bool = True
+def make_snapshots(dest, due_snapshots, snapshots):
+    log.debug_ts_msg('Start: make snapshots.')
+    return_val = True
     for snapshot in due_snapshots:
         source = clean_path(dest + '/backup.latest')
         destination = clean_path(dest + '/' + snapshot + '.0.incomplete')
         try:
             log.debug_ts_msg('Making links from: ' + source + ' to ' + snapshot + '.0')
-            # rm old '.incomplete' dir if it still exists.
             subprocess.check_output(['rm', '-rf', destination])
-            # create hard links
             subprocess.check_output(['cp', '-al', source, destination])
-            # rename remove '.incomplete' label from destination dir name.
+            time.sleep(3)
+            shift_snaps(dest, snapshot, snapshots)
+            time.sleep(3)
+            # remove '.incomplete' label from destination dir name.
             subprocess.check_output(['mv', destination, destination.replace('.incomplete', '')])
-        except subprocess.CalledProcessError as e:
-            log.debug(e)
+            update_timestamp(dest, snapshot, snapshots)
+        except subprocess.CalledProcessError as _e:
+            log.debug(_e)
             log.error('    Error: Could not make hardlinks for: ' + dest)
-            bool = False
-    log.debug_ts_msg('End: make hardlinks.')
-    return bool
+            return_val = False
+            continue
+    log.debug_ts_msg('End: make snapshots.')
+    return return_val
 
 
 # Delete all folders that are out of keep range.
 # These are the snapshot folders that contain states that are
-#   older than what the user likes tokeep.
+#   older than what the user likes to keep.
 # The range is defined in config.
 def del_deprecated_snaps(deprecated_dirs):
     log.debug_ts_msg('Start: delete deprecated snapshots.')
-    bool = True
+    return_val = True
     for _dir in deprecated_dirs:
         log.debug_ts_msg('Deleting dir: ' + _dir)
-        if not check_path(_dir) == False:
+        if check_path(_dir):
             try:
-                shutil.rmtree(str(_dir))
-            except OSError as e:
-                log.debug(e)
-                log.error('    Error: Could not delete deprecated snapshot ' +
-                          _dir)
-                bool = False
+                subprocess.check_output(['rm', '-rf', str(_dir)])
+            except subprocess.CalledProcessError as e:
+                log.debug(_e)
+                log.error('    Error: Could not delete deprecated snapshot ' + _dir)
+                return_val = False
     log.debug_ts_msg('End: delete deprecated snapshots.')
-    return bool
-
-
-def update_timestamps(dest, due_snapshots, timestamps):
-    for snapshot in due_snapshots:
-        timestamps[snapshot] = time.strftime('%Y-%m-%d %H:%M:%S')
-        write_yaml(timestamps, clean_path(dest + '/' + TIMESTAMP_FILE))
-    return True
+    return return_val
 
 
 def main():
-
     cfg_data = load_yaml(CFG)
     app = App(cfg_data)
 
     # Loop through each job that is defined in the cfg.
     for _id, job_cfg in enumerate(app.jobs):
 
-        job = Job(_id, job_cfg, app) # Create job instance with job config data.
-        job.t = time.time() # set initial timestamp
+        job = Job(_id, job_cfg, app)  # Create job instance with job config data.
+        job.t = time.time()  # set initial timestamp
 
         if not job.due_snapshots:
             log.out_line(['[Skipped] No dues for: ' + job.src])
@@ -434,15 +441,7 @@ def main():
             log.job_out(2, job.t)
             continue
 
-        if not shift_snaps(job.dest, job.due_snapshots, job.snapshots):
-            log.job_out(2, job.t)
-            continue
-
-        if not make_hard_links(job.dest, job.due_snapshots):
-            log.job_out(2, job.t)
-            continue
-
-        if not update_timestamps(job.dest, job.due_snapshots, job.timestamps):
+        if not make_snapshots(job.dest, job.due_snapshots, job.snapshots):
             log.job_out(2, job.t)
             continue
 
@@ -453,15 +452,15 @@ if __name__ == "__main__":
     log = Log('main')
     log = log.logger
     lock = check_lock(LOCK_FILE)
-    os.setpgrp() # create new process group, become its leader. os.killpg will kill all processes.
+    os.setpgrp()  # create new process group, become its leader. os.killpg will kill all processes.
     try:
         main()
     except KeyboardInterrupt:
         log.error('    Error: Backup aborted by user.')
         log.job_out(2, time.time())
-        os.killpg(0, signal.SIGKILL) # kill all processes in my group
-    except Exception as e:
+        os.killpg(0, signal.SIGKILL)  # kill all processes in my group
+    except Exception as _e:
         log.error('    Error: An Exception was thrown: ')
-        log.error(e)
-        os.killpg(0, signal.SIGKILL) # kill all processes in my group
+        log.error(_e)
+        os.killpg(0, signal.SIGKILL)  # kill all processes in my group
         log.job_out(2, time.time())
