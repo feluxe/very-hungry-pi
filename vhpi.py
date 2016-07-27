@@ -203,9 +203,6 @@ class Log(object):
         self.logger.debug('    ' + time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + message)
 
 
-# Kill Sequence
-
-
 # check if machine is online.
 def is_machine_online(ip):
     ping_command = ["ping", "-c", "1", ip]
@@ -400,7 +397,6 @@ def make_snapshots(base_dest, due_snapshots, snapshots):
         log.debug_ts_msg('Start: processing snapshot: ' + snapshot)
         source = clean_path(base_dest + '/backup.latest')
         snap_dest = clean_path(base_dest + '/' + snapshot + '.0.incomplete')
-
         if not remove_incomplete_snapshots(snap_dest):
             continue
         if not make_hardlinks(source, snap_dest):
@@ -421,48 +417,37 @@ def make_snapshots(base_dest, due_snapshots, snapshots):
 def main():
     cfg_data = load_yaml(CFG)
     app = App(cfg_data)
-
     # Loop through each job that is defined in the cfg.
     for _id, job_cfg in enumerate(app.jobs):
-
         job = Job(_id, job_cfg, app)  # Create job instance with job config data.
         job.t = time.time()  # set initial timestamp
-
         if not job.due_snapshots:
             log.out_line(['[Skipped] No dues for: ' + job.src])
             continue
-
         if not is_machine_online(job.src_ip):
             i1 = '[Skipped] Source offline: ' + job.src_ip
             i2 = 'Due: ' + ', '.join(job.due_snapshots)
             log.out_line([i1, i2])
             continue
-
         log.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' [Executing] ' +
                  job.src + '\n')
         log.info('    Due: ' + ', '.join(job.due_snapshots))
-
         if not job.check_valid_file(job.src):
             log.job_out(2, job.t)
             continue
-
         if not job.check_dest(job.dest):
             log.job_out(2, job.t)
             continue
-
         # Start a watcher in a thread which checks if source machine is online each 60s.
         t_machine_watcher = threading.Thread(target=job.machine_watcher, args=(job.src_ip, job.t))
         t_machine_watcher.setDaemon(True)
         t_machine_watcher.start()
-
         if not job.exec_rsync(job.rsync_command):
             log.job_out(2, job.t)
             continue
-
         if not make_snapshots(job.dest, job.due_snapshots, job.snapshots):
             log.job_out(2, job.t)
             continue
-
         log.job_out(0, job.t)
 
 
