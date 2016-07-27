@@ -343,10 +343,15 @@ def make_hard_links(dest, due_snapshots):
     bool = True
     for snapshot in due_snapshots:
         source = clean_path(dest + '/backup.latest')
-        destination = clean_path(dest + '/' + snapshot + '.0')
+        destination = clean_path(dest + '/' + snapshot + '.0.incomplete')
         try:
             log.debug_ts_msg('Making links from: ' + source + ' to ' + snapshot + '.0')
+            # rm old '.incomplete' dir if it still exists.
+            subprocess.check_output(['rm', '-rf', destination])
+            # create hard links
             subprocess.check_output(['cp', '-al', source, destination])
+            # rename remove '.incomplete' label from destination dir name.
+            subprocess.check_output(['mv', destination, destination.replace('.incomplete', '')])
         except subprocess.CalledProcessError as e:
             log.debug(e)
             log.error('    Error: Could not make hardlinks for: ' + dest)
