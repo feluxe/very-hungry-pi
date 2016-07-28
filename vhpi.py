@@ -20,6 +20,9 @@ LOCK_FILE = CFG_DIR + '/lock'
 VALID_FILE = '.backup_valid'
 TIMESTAMP_FILE = '.backup_timestamps'
 
+rsync_process = None
+hardlink_process = None
+
 
 class App(object):
     def __init__(self, _cfg):
@@ -49,9 +52,6 @@ class Job(object):
                                                       self.src,
                                                       self.dest)
         self.init_time = None
-        self.rsync_process = None
-        self.hardlink_process = None
-        self.machine_watcher_thread = None
 
     @staticmethod
     def get_timestamps(dest, intervals):
@@ -112,7 +112,7 @@ class Job(object):
     # Check if source is online repeatedly. If it goes offline exit program.
     def machine_watcher(self):
         time.sleep(5)  # Wait for rsync to run.
-        while self.rsync_process:
+        while rsync_process:
             if not self.is_machine_online():
                 log.info('    Error: Source went offline: ' +
                          time.strftime('%Y-%m-%d %H:%M:%S'))
@@ -121,24 +121,25 @@ class Job(object):
 
     # Start a watcher in a thread which checks if source machine is online each 60s.
     def start_machine_watcher(self):
-        self.machine_watcher_thread = threading.Thread(target=self.machine_watcher)
-        self.machine_watcher_thread.setDaemon(True)
-        self.machine_watcher_thread.start()
+        machine_watcher_thread = threading.Thread(target=self.machine_watcher)
+        machine_watcher_thread.setDaemon(True)
+        machine_watcher_thread.start()
 
     # execute rsync command.
     def exec_rsync(self):
+        global  rsync_process
         log.debug_ts_msg('Start: rsync execution.')
         return_val = True
         try:
             log.info('    Executing: ' + ' '.join(self.rsync_command))
-            self.rsync_process = subprocess.Popen(self.rsync_command,
+            rsync_process = subprocess.Popen(self.rsync_command,
                                                   shell=False,
                                                   stdin=subprocess.PIPE,
                                                   stdout=subprocess.PIPE,
                                                   stderr=subprocess.STDOUT,
                                                   close_fds=True,
                                                   universal_newlines=True)
-            output = self.rsync_process.stdout.read()
+            output = rsync_process.stdout.read()
             log.debug('    ' + output.replace('\n', '\n    '))
             log.if_in_line('warning', 'rsync: ', output)
             log.if_in_line('warning', 'rsync error: ', output)
@@ -148,7 +149,7 @@ class Job(object):
             if e.returncode and e.returncode != 23:
                 log.warning('    Error: Unknown Rsync Exit Code')
                 return_val = False
-        self.rsync_process = None
+        rsync_process = None
         log.debug_ts_msg('End: rsync execution.\n')
         return return_val
 
@@ -235,25 +236,26 @@ class Job(object):
         return output
 
     def make_hardlinks(self, src, dest):
+        global hardlink_process
         log.debug_ts_msg('  Making links from: ' + src.split('/')[-1] + ' to '
                          + dest.split('/')[-1])
         return_val = True
         try:
-            self.hardlink_process = subprocess.Popen(['cp', '-al', src, dest],
+            hardlink_process = subprocess.Popen(['cp', '-al', src, dest],
                                                      shell=False,
                                                      stdin=subprocess.PIPE,
                                                      stdout=subprocess.PIPE,
                                                      stderr=subprocess.STDOUT,
                                                      close_fds=True,
                                                      universal_newlines=True)
-            output = self.hardlink_process.stdout.read()
+            output = hardlink_process.stdout.read()
             if output:
                 log.debug(output)
         except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
             log.debug(e)
             log.error('    Critical Error: Could not make hardlinks for: ' + src)
             return_val = False
-        self.hardlink_process = None
+        hardlink_process = None
         return return_val
 
     @staticmethod
@@ -295,13 +297,9 @@ class Job(object):
         return output
 
     def exit(self, code):
-        log.job_out(code, self.init_time)
-        if self.rsync_process:
-            self.rsync_process.kill()
-        if self.hardlink_process:
-            self.hardlink_process.kill()
+        kill_processes()
         self.alive = False
-
+        log.job_out(code, self.init_time)
 
 class Log(object):
     def __init__(self, name):
@@ -419,7 +417,19 @@ def check_path(path):
             return False
 
 
+def kill_processes():
+    global rsync_process
+    global hardlink_process
+    if rsync_process:
+        rsync_process.kill()
+        rsync_process = None
+    if hardlink_process:
+        hardlink_process.kill()
+        hardlink_process = None
+
+
 def exit_main():
+    kill_processes()
     log.debug('Exit Program.')
     sys.exit()
 
