@@ -127,18 +127,18 @@ class Job(object):
 
     # execute rsync command.
     def exec_rsync(self):
-        global  rsync_process
+        global rsync_process
         log.debug_ts_msg('Start: rsync execution.')
         return_val = True
         try:
             log.info('    Executing: ' + ' '.join(self.rsync_command))
             rsync_process = subprocess.Popen(self.rsync_command,
-                                                  shell=False,
-                                                  stdin=subprocess.PIPE,
-                                                  stdout=subprocess.PIPE,
-                                                  stderr=subprocess.STDOUT,
-                                                  close_fds=True,
-                                                  universal_newlines=True)
+                                             shell=False,
+                                             stdin=subprocess.PIPE,
+                                             stdout=subprocess.PIPE,
+                                             stderr=subprocess.STDOUT,
+                                             close_fds=True,
+                                             universal_newlines=True)
             output = rsync_process.stdout.read()
             log.debug('    ' + output.replace('\n', '\n    '))
             log.if_in_line('warning', 'rsync: ', output)
@@ -242,12 +242,12 @@ class Job(object):
         return_val = True
         try:
             hardlink_process = subprocess.Popen(['cp', '-al', src, dest],
-                                                     shell=False,
-                                                     stdin=subprocess.PIPE,
-                                                     stdout=subprocess.PIPE,
-                                                     stderr=subprocess.STDOUT,
-                                                     close_fds=True,
-                                                     universal_newlines=True)
+                                                shell=False,
+                                                stdin=subprocess.PIPE,
+                                                stdout=subprocess.PIPE,
+                                                stderr=subprocess.STDOUT,
+                                                close_fds=True,
+                                                universal_newlines=True)
             output = hardlink_process.stdout.read()
             if output:
                 log.debug(output)
@@ -300,6 +300,7 @@ class Job(object):
         kill_processes()
         self.alive = False
         log.job_out(code, self.init_time)
+
 
 class Log(object):
     def __init__(self, name):
