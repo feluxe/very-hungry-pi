@@ -431,7 +431,6 @@ def kill_processes():
 
 def exit_main():
     kill_processes()
-    log.debug('Exit Program.')
     sys.exit()
 
 
