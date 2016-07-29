@@ -352,10 +352,10 @@ class Log(object):
         self.logger.debug('    ' + time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + message)
 
     def skip_msg(self, online, due_jobs, ip, path):
-        ip = '[Ip: ' + fixed_str_len(ip, 15) + '] '
-        path = '[Src: ' + fixed_str_len(path, 50) + '] '
+        ip = '[Ip: ' + fixed_str_len(ip, 15, ' ') + '] '
+        path = '[Src: ' + fixed_str_len(path, 50, '·') + '] '
         online = 'online' if online else 'offline'
-        online = '[Source ' + fixed_str_len(online, 7) + '] '
+        online = '[Source ' + fixed_str_len(online, 7, ' ') + '] '
         due = '[Due: ' + ', '.join(due_jobs) + ']\t' if due_jobs else '[No due jobs]\t'
         msg = '[Skipped] ' + ip + path + online + due
         self.logger.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + msg)
@@ -416,7 +416,7 @@ def clean_path(_path):
     return _path.replace('//', '/')
 
 
-def fixed_str_len(_str, limit):
+def fixed_str_len(_str, limit, symbol):
     output = ''
     if len(_str) == limit:
         output = _str
@@ -424,7 +424,7 @@ def fixed_str_len(_str, limit):
         hl = int(limit / 2)
         output = _str.replace(_str[hl - 3:(hl - 2) * -1], '[...]')
     elif len(_str) < limit:
-        output = _str + ' ' + ('·' * (limit - 1 - len(_str)))
+        output = _str + ' ' + (symbol * (limit - 1 - len(_str)))
     return output
 
 
@@ -470,7 +470,8 @@ def main():
         if not job.due_snapshots:
             log.skip_msg(True, job.due_snapshots, job.src_ip, job.src)
             continue
-        log.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' [Executing] ' + job.src + '\n')
+        msg = ' [Executing] [Ip: ' + job.src_ip + '] ' + job.src + '\n'
+        log.info(time.strftime('%Y-%m-%d %H:%M:%S') + msg)
         log.info('    Due: ' + ', '.join(job.due_snapshots))
         if not job.check_valid_file():
             job.exit(2)
