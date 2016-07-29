@@ -235,7 +235,8 @@ class Job(object):
                 output = False
         return output
 
-    def make_hardlinks(self, src, dest):
+    @staticmethod
+    def make_hardlinks(src, dest):
         global hardlink_process
         log.debug_ts_msg('  Making links from: ' + src.split('/')[-1] + ' to '
                          + dest.split('/')[-1])
@@ -319,6 +320,7 @@ class Log(object):
         logging.Logger.if_in_line = self.matching_lines
         logging.Logger.job_out = self.job_out
         logging.Logger.debug_ts_msg = self.debug_ts_msg
+        logging.Logger.skip_msg = self.skip_msg
         return logging.getLogger(name)
 
     # Filter a string for words. Each line that contains a word will be logged.
@@ -348,6 +350,15 @@ class Log(object):
 
     def debug_ts_msg(self, message=''):
         self.logger.debug('    ' + time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + message)
+
+    def skip_msg(self, online, due_jobs, ip, path):
+        ip = '[Ip: ' + fixed_str_len(ip, 15) + '] '
+        path = '[Src: ' + fixed_str_len(path, 50) + '] '
+        online = 'online' if online else 'offline'
+        online = '[Source ' + fixed_str_len(online, 7) + '] '
+        due = '[Due: ' + ', '.join(due_jobs) + ']\t' if due_jobs else '[No due jobs]\t'
+        msg = '[Skipped] ' + ip + path + online + due
+        self.logger.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + msg)
 
 
 # Check if another instance of the script is already running. If so exit.
@@ -405,6 +416,18 @@ def clean_path(_path):
     return _path.replace('//', '/')
 
 
+def fixed_str_len(_str, limit):
+    output = ''
+    if len(_str) == limit:
+        output = _str
+    elif len(_str) > limit:
+        hl = int(limit / 2)
+        output = _str.replace(_str[hl - 3:(hl - 2) * -1], '[...]')
+    elif len(_str) < limit:
+        output = _str + ' ' + ('·' * (limit - 1 - len(_str)))
+    return output
+
+
 # Check if path exists and return (file|dir| false).
 def check_path(path):
     if not os.path.exists(path):
@@ -441,12 +464,11 @@ def main():
     for _id, job_cfg in enumerate(app.jobs):
         job = Job(_id, job_cfg, app)  # Create job instance with job config data.
         job.init_time = time.time()  # set initial timestamp
-        if not job.due_snapshots:
-            log.job_out(1, job.init_time, 'No dues for: ' + job.src)
-            continue
         if not job.is_machine_online():
-            message = 'Source offline: ' + job.src_ip + ' Due: ' + ', '.join(job.due_snapshots)
-            log.job_out(1, job.init_time, message)
+            log.skip_msg(False, job.due_snapshots, job.src_ip, job.src)
+            continue
+        if not job.due_snapshots:
+            log.skip_msg(True, job.due_snapshots, job.src_ip, job.src)
             continue
         log.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' [Executing] ' + job.src + '\n')
         log.info('    Due: ' + ', '.join(job.due_snapshots))
