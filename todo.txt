@@ -18,6 +18,8 @@ Dupe deletion function.
         Make hardlinks of that file to the places where the dupes where
             keep the original name of cause.
     Add Config to set interval for dupe removal
+    Add an option to define a minimum file size under which files will be excluded from dupe removal.
+      Dupe removal does not make sense for little files.
 
 
 
