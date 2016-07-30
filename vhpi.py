@@ -424,7 +424,7 @@ def fixed_str_len(_str, limit, symbol):
         hl = int(limit / 2)
         output = _str.replace(_str[hl - 3:(hl - 2) * -1], '[...]')
     elif len(_str) < limit:
-        output = _str + ' ' + (symbol * (limit - 1 - len(_str)))
+        output = _str + (symbol * (limit - len(_str)))
     return output
 
 
