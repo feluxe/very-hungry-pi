@@ -6,8 +6,10 @@ version: 1
 disable_existing_loggers: true
 handlers:
   logfile_debug:
-    class: logging.FileHandler
-    filename: ~/.very_hungry_pi/debug.log
+    class: logging.handlers.RotatingFileHandler
+    filename: /home/felix/.very_hungry_pi/debug.log
+    maxBytes: 1073741824
+    backupCount: 1
     level: DEBUG
   logfile_info:
     class: logging.FileHandler

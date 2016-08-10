@@ -114,8 +114,7 @@ class Job(object):
         time.sleep(5)  # Wait for rsync to run.
         while rsync_process:
             if not self.is_machine_online():
-                log.info('    Error: Source went offline: ' +
-                         time.strftime('%Y-%m-%d %H:%M:%S'))
+                log.info('    Error: Source went offline: ' + time.strftime('%Y-%m-%d %H:%M:%S'))
                 self.exit(2)
             time.sleep(60)
 
@@ -300,7 +299,6 @@ class Job(object):
     def exit(self, code):
         kill_processes()
         self.alive = False
-        log.job_out(code, self.init_time)
 
 
 class Log(object):
@@ -483,10 +481,14 @@ def main():
         if not job.exec_rsync():
             job.exit(2)
             continue
-        if job.alive and not job.make_snapshots():
+        if job.alive or not job.make_snapshots():
             job.exit(2)
             continue
-        job.exit(0)
+        if job.alive:
+            job.exit(0)
+        else:
+            job.exit(2)
+
     exit_main()
 
 
