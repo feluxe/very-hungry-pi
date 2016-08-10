@@ -481,7 +481,7 @@ def main():
         if not job.exec_rsync():
             job.exit(2)
             continue
-        if job.alive or not job.make_snapshots():
+        if job.alive and not job.make_snapshots():
             job.exit(2)
             continue
         if job.alive:
