@@ -299,6 +299,7 @@ class Job(object):
     def exit(self, code):
         kill_processes()
         self.alive = False
+        log.job_out(code, self.init_time)
 
 
 class Log(object):
