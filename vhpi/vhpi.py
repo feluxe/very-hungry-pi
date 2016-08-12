@@ -14,7 +14,7 @@ import threading
 
 HOME = os.path.expanduser("~")
 CFG_DIR = HOME + '/.very_hungry_pi'
-CFG = CFG_DIR + '/config.yaml'
+CFG_FILE = CFG_DIR + '/config.yaml'
 LOG_CFG = CFG_DIR + '/log_config.yaml'
 LOCK_FILE = CFG_DIR + '/lock'
 VALID_FILE = '.backup_valid'
@@ -24,7 +24,7 @@ rsync_process = None
 hardlink_process = None
 
 
-class App(object):
+class Cfg(object):
     def __init__(self, _cfg):
         self.jobs = _cfg['jobs_cfg']
         self.exclude_lib = _cfg['app_cfg']['exclude_lib']
@@ -32,21 +32,20 @@ class App(object):
 
 
 class Job(object):
-    def __init__(self, job_id, _job_cfg, _app):
+    def __init__(self, _job_cfg, _script_cfg):
         self.alive = True
-        self.id = job_id
         self.src_ip = _job_cfg['source_ip']
         self.src = _job_cfg['rsync_src']
         self.dest = _job_cfg['rsync_dest']
         self.rsync_options = _job_cfg['rsync_options']
         self.excludes = self.get_excludes(_job_cfg['excludes'],
                                           _job_cfg['exclude_lists'],
-                                          _app.exclude_lib)
+                                          _script_cfg.exclude_lib)
         self.snapshots = _job_cfg['snapshots']
-        self.timestamps = self.get_timestamps(self.dest, _app.intervals)
+        self.timestamps = self.get_timestamps(self.dest, _script_cfg.intervals)
         self.due_snapshots = self.get_due_snapshots(self.snapshots,
                                                     self.timestamps,
-                                                    _app.intervals)
+                                                    _script_cfg.intervals)
         self.rsync_command = self.build_rsync_command(self.rsync_options,
                                                       self.excludes,
                                                       self.src,
@@ -457,11 +456,10 @@ def exit_main():
 
 
 def main():
-    cfg_data = load_yaml(CFG)
-    app = App(cfg_data)
-    # Loop through each job that is defined in the cfg.
-    for _id, job_cfg in enumerate(app.jobs):
-        job = Job(_id, job_cfg, app)  # Create job instance with job config data.
+    script_cfg = Cfg(load_yaml(CFG_FILE))
+    # Loop through each job that is defined in cfg.
+    for job_cfg in script_cfg.jobs:
+        job = Job(job_cfg, script_cfg)  # Create job instance with job config data.
         job.init_time = time.time()  # set initial timestamp
         if not job.is_machine_online():
             log.skip_msg(False, job.due_snapshots, job.src_ip, job.src)
@@ -469,8 +467,8 @@ def main():
         if not job.due_snapshots:
             log.skip_msg(True, job.due_snapshots, job.src_ip, job.src)
             continue
-        msg = ' [Executing] ' + job.src_ip + '\t' + job.src + '\n'
-        log.info(time.strftime('%Y-%m-%d %H:%M:%S') + msg)
+        log_msg = ' [Executing] ' + job.src_ip + '\t' + job.src + '\n'
+        log.info(time.strftime('%Y-%m-%d %H:%M:%S') + log_msg)
         log.info('    Due: ' + ', '.join(job.due_snapshots))
         if not job.check_valid_file():
             job.exit(2)
@@ -489,7 +487,6 @@ def main():
             job.exit(0)
         else:
             job.exit(2)
-
     exit_main()
 
 
