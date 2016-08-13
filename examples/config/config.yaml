@@ -1,0 +1,45 @@
+
+# For more information: https://github.com/feluxe/very_hungry_pi
+app_cfg:
+  exclude_lib:
+    standard_list: [
+      lost+found/*,
+      .cache/chromium/*,
+      .mozilla/firefox/*/Cache,
+      .cache/thumbnails/*,
+      .local/share/Trash/*
+    ]
+    another_list: [
+      some_dir
+    ]
+  intervals: {
+    hourly: 3600,
+    six-hourly: 21600,
+    daily: 86400,
+    weekly: 604800,
+    monthly: 2592000,
+    yearly: 31536000
+  }
+
+jobs_cfg:
+
+  - source_ip: 192.168.178.20
+    rsync_src: tests/dummy_src/src1/
+    rsync_dest: tests/dummy_dest/dest1/
+    rsync_options: -aAHSvX --delete
+    exclude_lists: [
+      standard_list,
+      another_list
+    ]
+    excludes: [
+      downloads,
+      tmp
+    ]
+    snapshots:
+      hourly: 0
+      six-hourly: 1
+      daily: 7
+      weekly: 4
+      monthly: 6
+      yearly: 6
+
