@@ -3,20 +3,25 @@
 
 ## Overview
 With `vhpi` you can turn your Raspberry Pi into a silent backup farm for your LAN.
-Vhpi creates [incremental](https://en.wikipedia.org/wiki/Incremental_backup) [snapshot](#snapshots) backups of available network shares (e.g. NFS, Samba) silently and automated with a minimum of disk space required.
+Vhpi creates [incremental](https://en.wikipedia.org/wiki/Incremental_backup) [snapshot](#snapshots) backups of available network shares (e.g. NFS, Samba) silently and automated with a minimum of disk space required using [rsync](https://en.wikipedia.org/wiki/Rsync).
+The whole application runs on the Pi, the only thing the client computers (which you want to backup) need to do is to share/export the directories which you want to backup with your Pi. 
 To get the most control over the backups vhpi takes raw rsync options for configuration.
-Vhpi writes two log files; one for a short overview of the entire process ([info.log](examples/log/info.log)) and one for debugging ([debug.log](examples/log/debug.log)).
+Vhpi writes two log files: one for a short overview of the entire process ([info.log exmpl.](examples/log/info.log)) and one for debugging ([debug.log exmpl.](examples/log/debug.log)).
 <br><br>Just setup vhpi, run your Pi 24/7 and don't care about backups no more.
 <br>
 <br>
-**These are the steps that need to be done in order to setup vhpi:**
+**Requirements:**
 
-* create a NFS or Samba share for any directory of any computer in your LAN that you want to backup. (Of cause vhpi lets you create backups of your Pi's local files too)
-* Share the directories of all computer that you want to backup with your Pi. E.g using NFS or Samba. You can skip this step and the next one, if you only want to backup local dirs of your Pi.
-* use `autofs` or similar to automatically mount the shared directories with your Pi.
-* install and configure vhpi (see: [Installation & Configuration](#installation_&_setup))
-* add a cronjob to run vhpi automatically. (see: [Create a cronjob](#create_cronjob))
-* That's it. Now your Pi will automatically create new snapshots if a source computer is online and a snapshot is due.
+* You need Python >= 3.4 for the script to run.
+* The file system of your Backup destination needs to support hard links. (most common fs like NTFS and ext do...)
+
+**Short setup overview:**
+
+1. Your Pi needs access to the directories of the computers that you want to backup. Just share/export them with `NFS` or `Samba` (You can find plenty tutorials online). Perhaps you can backup the local directories of your Pi as well. 
+2. Use `autofs` or similar to automatically mount the shared directories with your Pi when ever they are available.
+3. Install and configure vhpi (see: [Installation & Configuration](#installation_&_setup))
+4. Add a cronjob to run vhpi automatically. (see: [Create a cronjob](#create_cronjob))
+5. That's about it. After these steps your Pi will automatically create new snapshots if a source computer is online and a snapshot is due.
 
 
 ## <a name="installation_&_setup"></a> Installation & Configuration
@@ -129,12 +134,14 @@ Now vhpi should start every hour and you should see some activity in the log fil
 
     
 
-## <a name="snapshots"></a> Snapshots
+## <a name="snapshots"></a> Snapshots explanation
 
-A snapshot represents the state in which the source directory was, at a certain point in time. For each new snapshot only new and changed files are added; files that haven't changed are created as `hard links` to keep the backup slim.
-The following example grafik shows the result of a backup with the following snapshot configuration, that was run several years (see all the yearly dirs were created):
+A snapshot represents the state in which the source directory was, at a certain point in time. For each new snapshot only new and changed files are added; files that remain identical between the snapshots are created as `hard links`. This way backups remain slim even if there are plenty of snapshots.
 
-**snapshot config example**
+**Example:**
+
+If you have this snapshot config in `config.yaml` for a backup:
+
 ```yaml
 ...
 rsync_src: sample/src/dir
@@ -149,15 +156,16 @@ snapshots:
 ...
 ```
 
-**sample/dest/dir**
-<br>
+the resulting backup directory structure for `sample/src/dir` will look like this (after some years):
+
 <img src="assets/backup_dest.jpg" alt="Logo" />
 
 
 
 
-
 ## What the script does in detail
+
+TODO: This changed a little and needs an update.
 
 Each time vhpi.py is executed by the cronjob, this is what happens:
 
@@ -232,7 +240,8 @@ jobs_cfg:
       
   # Source 2:
   - source_ip: 192.168.178.36
-   # etc...
+   # etc.. reapt stuff from 'Source 1'
+   
  ```
  
 
