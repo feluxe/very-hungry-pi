@@ -128,7 +128,7 @@ class Job(object):
     # Check if source is online repeatedly. If it goes offline exit program.
     def machine_watcher(self):
         time.sleep(5)  # Wait for rsync to run.
-        while rsync_process:
+        while self.alive:
             if not self.is_machine_online():
                 log.info('    Error: Source went offline: ' + time.strftime('%Y-%m-%d %H:%M:%S'))
                 self.exit(2)
