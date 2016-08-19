@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-# Very Hungry Pi (vhpi) - An application to create backups.
-#
 # Copyright (C) 2016 Felix Meyer-Wolters
 #
-# This program is free software: you can redistribute it and/or modify
+# This file is part of 'Very Hungry Pi' (vhpi) - An application to create backups.
+#
+# 'Very Hungry Pi' is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -17,39 +17,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import time
+
+# This module contains the logic and routines that are needed to create a backup from a source
+# directory.
+
 import datetime
 import subprocess
 import glob
-import logging
-import logging.config
-import sys
-import fcntl
-import yaml
 import threading
+import os
+import time
 
-HOME = os.path.expanduser("~")
-CFG_DIR = HOME + '/.very_hungry_pi'
-CFG_FILE = CFG_DIR + '/config.yaml'
-LOG_CFG = CFG_DIR + '/log_config.yaml'
-LOCK_FILE = CFG_DIR + '/lock'
-VALID_FILE = '.backup_valid'
-TIMESTAMP_FILE = '.backup_timestamps'
-
-rsync_process = None
-hardlink_process = None
-
-
-class Cfg(object):
-    def __init__(self, _cfg):
-        self.jobs = _cfg['jobs_cfg']
-        self.exclude_lib = _cfg['app_cfg']['exclude_lib']
-        self.intervals = _cfg['app_cfg']['intervals']
+from .settings import Settings as S
+from .logger import log
+from .lib import clean_path, load_yaml, check_path, write_yaml, kill_processes, exit_main
+from .processes import Processes
 
 
 class Job(object):
-    def __init__(self, _job_cfg, _script_cfg):
+
+    def __init__(self, _job_cfg):
         self.alive = True
         self.src_ip = _job_cfg['source_ip']
         self.src = _job_cfg['rsync_src']
@@ -57,21 +44,22 @@ class Job(object):
         self.rsync_options = _job_cfg['rsync_options']
         self.excludes = self.get_excludes(_job_cfg['excludes'],
                                           _job_cfg['exclude_lists'],
-                                          _script_cfg.exclude_lib)
+                                          S.exclude_lib)
         self.snapshots = _job_cfg['snapshots']
-        self.timestamps = self.get_timestamps(self.dest, _script_cfg.intervals)
+        self.timestamps = self.get_timestamps(self.dest, S.intervals)
         self.due_snapshots = self.get_due_snapshots(self.snapshots,
                                                     self.timestamps,
-                                                    _script_cfg.intervals)
+                                                    S.intervals)
         self.rsync_command = self.build_rsync_command(self.rsync_options,
                                                       self.excludes,
                                                       self.src,
                                                       self.dest)
         self.init_time = None
+        self.validation_file = clean_path(self.src + "/" + S.validation_file)
 
     @staticmethod
     def get_timestamps(dest, intervals):
-        timestamps = load_yaml(clean_path(dest + '/' + TIMESTAMP_FILE), True)
+        timestamps = load_yaml(clean_path(dest + '/' + S.timestamp_file), True)
         if type(timestamps) is not dict:
             timestamps = {}
         for interval in intervals:
@@ -86,17 +74,13 @@ class Job(object):
                self.is_due(interval, intervals, timestamps[interval])]
         return due
 
-    def check_valid_file(self):
-        v_file_path = clean_path(self.src + "/" + VALID_FILE)
-        if not check_path(v_file_path) == 'file':
-            log.error('    Error: Could not validate source via '
-                      '"validation file"' + v_file_path)
+    def check_validation_file(self):
+        if not check_path(self.validation_file) == 'file':
             return False
         return True
 
     def check_dest(self):
         if not check_path(self.dest) == 'dir':
-            log.error('    Error: Invalid Destination:' + self.dest)
             return False
         return True
 
@@ -126,35 +110,41 @@ class Job(object):
             return False
 
     # Check if source is online repeatedly. If it goes offline exit program.
-    def machine_watcher(self):
-        time.sleep(5)  # Wait for rsync to run.
+    def health_monitor(self):
         while self.alive:
+            if not self.check_validation_file():
+                log.error('    Error: Could not validate source via '
+                          '"validation file"' + self.validation_file)
+                self.exit(2)
+            if not self.check_dest():
+                log.info('    Error: Invalid Destination:' + self.dest + ': '
+                         + time.strftime(S.timestamp_format))
+                self.exit(2)
             if not self.is_machine_online():
-                log.info('    Error: Source went offline: ' + time.strftime('%Y-%m-%d %H:%M:%S'))
+                log.info('    Error: Source went offline: ' + time.strftime(S.timestamp_format))
                 self.exit(2)
             time.sleep(60)
 
     # Start a watcher in a thread which checks if source machine is online each 60s.
-    def start_machine_watcher(self):
-        machine_watcher_thread = threading.Thread(target=self.machine_watcher)
-        machine_watcher_thread.setDaemon(True)
-        machine_watcher_thread.start()
+    def start_health_monitor(self):
+        health_monitor_thread = threading.Thread(target=self.health_monitor)
+        health_monitor_thread.setDaemon(True)
+        health_monitor_thread.start()
 
     # execute rsync command.
     def exec_rsync(self):
-        global rsync_process
         log.debug_ts_msg('Start: rsync execution.')
         return_val = True
         try:
             log.info('    Executing: ' + ' '.join(self.rsync_command))
-            rsync_process = subprocess.Popen(self.rsync_command,
-                                             shell=False,
-                                             stdin=subprocess.PIPE,
-                                             stdout=subprocess.PIPE,
-                                             stderr=subprocess.STDOUT,
-                                             close_fds=True,
-                                             universal_newlines=True)
-            output = rsync_process.stdout.read()
+            Processes.rsync = subprocess.Popen(self.rsync_command,
+                                               shell=False,
+                                               stdin=subprocess.PIPE,
+                                               stdout=subprocess.PIPE,
+                                               stderr=subprocess.STDOUT,
+                                               close_fds=True,
+                                               universal_newlines=True)
+            output = Processes.rsync.stdout.read()
             log.debug('    ' + output.replace('\n', '\n    '))
             log.if_in_line('warning', 'rsync: ', output)
             log.if_in_line('warning', 'rsync error: ', output)
@@ -164,7 +154,7 @@ class Job(object):
             if e.returncode and e.returncode != 23:
                 log.warning('    Error: Unknown Rsync Exit Code')
                 return_val = False
-        rsync_process = None
+        Processes.rsync = None
         log.debug_ts_msg('End: rsync execution.\n')
         return return_val
 
@@ -234,8 +224,8 @@ class Job(object):
     @staticmethod
     def update_timestamp(dest, snapshot, timestamps):
         log.debug_ts_msg('  Updating timestamp.')
-        timestamps[snapshot] = time.strftime('%Y-%m-%d %H:%M:%S')
-        write_yaml(timestamps, clean_path(dest + '/' + TIMESTAMP_FILE))
+        timestamps[snapshot] = time.strftime(S.timestamp_format)
+        write_yaml(timestamps, clean_path(dest + '/' + S.timestamp_file))
 
     @staticmethod
     def remove_incomplete_snapshots(dest):
@@ -252,26 +242,25 @@ class Job(object):
 
     @staticmethod
     def make_hardlinks(src, dest):
-        global hardlink_process
         log.debug_ts_msg('  Making links from: ' + src.split('/')[-1] + ' to '
                          + dest.split('/')[-1])
         return_val = True
         try:
-            hardlink_process = subprocess.Popen(['cp', '-al', src, dest],
-                                                shell=False,
-                                                stdin=subprocess.PIPE,
-                                                stdout=subprocess.PIPE,
-                                                stderr=subprocess.STDOUT,
-                                                close_fds=True,
-                                                universal_newlines=True)
-            output = hardlink_process.stdout.read()
+            Processes.cp = subprocess.Popen(['cp', '-al', src, dest],
+                                            shell=False,
+                                            stdin=subprocess.PIPE,
+                                            stdout=subprocess.PIPE,
+                                            stderr=subprocess.STDOUT,
+                                            close_fds=True,
+                                            universal_newlines=True)
+            output = Processes.cp.stdout.read()
             if output:
                 log.debug(output)
         except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
             log.debug(e)
-            log.error('    Critical Error: Could not make hardlinks for: ' + src)
+            log.error('    Critical Error: Could not create hardlinks for: ' + src)
             return_val = False
-        hardlink_process = None
+        Processes.cp = None
         return return_val
 
     @staticmethod
@@ -312,211 +301,17 @@ class Job(object):
         log.info('')
         return output
 
+    def check_readiness(self):
+        output = True
+        if not self.is_machine_online():
+            log.skip_msg(False, self.due_snapshots, self.src_ip, self.src)
+            output = False
+        if not self.due_snapshots:
+            log.skip_msg(True, self.due_snapshots, self.src_ip, self.src)
+            output = False
+        return output
+
     def exit(self, code):
         kill_processes()
         self.alive = False
         log.job_out(code, self.init_time)
-
-
-class Log(object):
-    def __init__(self, name):
-        self.name = name
-        self.logger = self.init_logger(self.name)
-
-    # Load log cfg file and initiate logging system.
-    # Add functions to 'logging' class.
-    def init_logger(self, name):
-        content = ''
-        with open(LOG_CFG, 'r') as stream:
-            for line in stream:
-                content += line.replace('~', HOME)
-            log_cfg = yaml.safe_load(content)
-        logging.config.dictConfig(log_cfg)
-        logging.Logger.if_in_line = self.matching_lines
-        logging.Logger.job_out = self.job_out
-        logging.Logger.debug_ts_msg = self.debug_ts_msg
-        logging.Logger.skip_msg = self.skip_msg
-        return logging.getLogger(name)
-
-    # Filter a string for words. Each line that contains a word will be logged.
-    # Can be used on the output of rsync to log each line with an 'error' or 'warning'.
-    def matching_lines(self, level, needle, lines):
-        lines = lines.splitlines()
-        matches = ['    ' + level.title() + ': ' + s
-                   for s in lines if needle in s]
-        matches_str = '\n'.join(matches)
-        dynamic_func = getattr(self.logger, level)
-        dynamic_func(matches_str)
-
-    # Log message used when a job ends.
-    def job_out(self, code, _t, message=''):
-        seconds = time.time() - _t
-        duration = time.strftime('%H:%M:%S', time.gmtime(seconds))
-        new_msg = ''
-        if code == 0:
-            new_msg += '[Completed] after: ' + duration + ' (h:m:s)' + message
-        elif code == 1:
-            new_msg += '[Skipped] ' + message
-        elif code == 2:
-            new_msg += '[Failed] after: ' + duration + ' (h:m:s)' + message
-        else:
-            new_msg += '[Unknown job termination] after: ' + duration + ' (h:m:s)' + message
-        self.logger.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + new_msg)
-
-    def debug_ts_msg(self, message=''):
-        self.logger.debug('    ' + time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + message)
-
-    def skip_msg(self, online, due_jobs, ip, path):
-        ip = fixed_str_len(ip, 15, ' ') + '  '
-        path = '[' + fixed_str_len(path, 50, '·') + ']  '
-        online = 'online' if online else 'offline'
-        online = 'Source ' + fixed_str_len(online, 7, ' ') + ' | '
-        due = 'Due: ' + ', '.join(due_jobs) + '\t' if due_jobs else 'No due jobs\t'
-        msg = '[Skipped] ' + ip + path + online + due
-        self.logger.info(time.strftime('%Y-%m-%d %H:%M:%S') + ' ' + msg)
-
-
-# Check if another instance of the script is already running. If so exit.
-def check_lock(lockfile):
-    try:
-        lockfile = open(lockfile, 'w')
-        fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    except BlockingIOError:
-        log.info('    Info: Another instance of this Script was executed, '
-                 'but it was blocked successfully. ' +
-                 time.strftime('%Y-%m-%d %H:%M:%S'))
-        sys.exit()
-    return lockfile
-
-
-# load Yaml
-def load_yaml(file, create_new=False):
-    output = None
-    file_dir = os.path.dirname(file)
-    if not check_path(file_dir) == 'dir':
-        log.critical('    Error: Could not find dir :' + file_dir)
-        exit_main()
-    try:
-        with open(file, 'r') as stream:
-            output = yaml.safe_load(stream)
-    except FileNotFoundError:
-        if not create_new:
-            log.critical('    Error: Could not read file :' + file)
-            exit_main()
-        output = open(file, 'w+')
-    except IOError as e:
-        log.critical('    Error: Could not read YAML file.', e)
-        exit_main()
-    except yaml.YAMLError as e:
-        log.critical("    Error: Error in YAML file:", e)
-        exit_main()
-    return output
-
-
-# Write Yaml
-def write_yaml(data, file):
-    try:
-        with open(file, 'w') as outfile:
-            outfile.write(yaml.dump(data, default_flow_style=True))
-    except IOError as e:
-        log.error('    Error: Could not write to YAML file.', e)
-        exit_main()
-    except yaml.YAMLError as e:
-        log.error("    Error writing YAML file:", e)
-        exit_main()
-    return True
-
-
-def clean_path(_path):
-    return _path.replace('//', '/')
-
-
-def fixed_str_len(_str, limit, symbol):
-    output = ''
-    if len(_str) == limit:
-        output = _str
-    elif len(_str) > limit:
-        hl = int(limit / 2)
-        output = _str.replace(_str[hl - 3:(hl - 2) * -1], '[...]')
-    elif len(_str) < limit:
-        output = _str + (symbol * (limit - len(_str)))
-    return output
-
-
-# Check if path exists and return (file|dir| false).
-def check_path(path):
-    if not os.path.exists(path):
-        return False
-    else:
-        if os.path.isfile(path):
-            return "file"
-        elif os.path.isdir(path):
-            return "dir"
-        else:
-            return False
-
-
-def kill_processes():
-    global rsync_process
-    global hardlink_process
-    if rsync_process:
-        rsync_process.kill()
-        rsync_process = None
-    if hardlink_process:
-        hardlink_process.kill()
-        hardlink_process = None
-
-
-def exit_main():
-    kill_processes()
-    sys.exit()
-
-
-def main():
-    script_cfg = Cfg(load_yaml(CFG_FILE))
-    # Loop through each job that is defined in cfg.
-    for job_cfg in script_cfg.jobs:
-        job = Job(job_cfg, script_cfg)  # Create job instance with job config data.
-        job.init_time = time.time()  # set initial timestamp
-        if not job.is_machine_online():
-            log.skip_msg(False, job.due_snapshots, job.src_ip, job.src)
-            continue
-        if not job.due_snapshots:
-            log.skip_msg(True, job.due_snapshots, job.src_ip, job.src)
-            continue
-        log_msg = ' [Executing] ' + job.src_ip + '\t' + job.src + '\n'
-        log.info(time.strftime('%Y-%m-%d %H:%M:%S') + log_msg)
-        log.info('    Due: ' + ', '.join(job.due_snapshots))
-        if not job.check_valid_file():
-            job.exit(2)
-            continue
-        if not job.check_dest():
-            job.exit(2)
-            continue
-        job.start_machine_watcher()
-        if not job.exec_rsync():
-            job.exit(2)
-            continue
-        if job.alive and not job.make_snapshots():
-            job.exit(2)
-            continue
-        if job.alive:
-            job.exit(0)
-        else:
-            job.exit(2)
-    exit_main()
-
-
-if __name__ == "__main__":
-    log = Log('main')
-    log = log.logger
-    lock = check_lock(LOCK_FILE)
-    try:
-        main()
-    except KeyboardInterrupt:
-        log.error('Error: Backup aborted by user.')
-        exit_main()
-    except Exception as err:
-        log.error('Error: An Exception was thrown.')
-        log.error(str(err))
-        exit_main()
