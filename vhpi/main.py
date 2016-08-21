@@ -18,14 +18,14 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-import sys
 import fcntl
+import sys
 import time
 
-from vhpi.logger import log
-from vhpi.lib import exit_main, load_yaml
 from vhpi.job import Job
-from vhpi.settings import Settings as S
+from .lib import exit_main, load_yaml
+from .logger import log
+from .settings import Settings as S
 
 
 # Check if another instance of the script is already running by using the 'flock' mechanism.
