@@ -86,9 +86,10 @@ So a good command to test the config would be `-avn --delete`
  
 More on rsync options can be found here: http://linux.die.net/man/1/rsync
  
-Now you should be ready to test-run vhpi manually with this command:
+Now you should be ready to test-run vhpi manually like that:
  ```
- $ python3 /opt/very_hungry_pi/vhpi.py
+ $ cd /opt/very_hungry_pi/
+ $ python3 -m vhpi.main
  ```
  If you get an error use the given information to adjust the config/setup.
  You can find the results of each execution in the log files as well (.very_hungry_pi/debug.log and .very_hungry_pi/info.log)
@@ -101,7 +102,7 @@ For most convienice your Pi should create its backups automatically. A good way 
 
 To run vhpi every hour you can just add the following line to `/etc/crontab`. Replace `username` with the username that is supposed to run vhpi. (in most cases that would be `root`)
 ```
-@hourly         username   python3 /opt/very_hungry_pi/vhpi.py
+@hourly         username   cd /opt/very_hungry_pi/ && python3 -m vhpi.main
 ```
 
 You can use any time interval you like, but keep in mind that the time interval should be at least as small as the smallest used snapshot interval. E.g. if you want to create hourly snapshots the cronjob should run vhpi at least every hour, otherwise you won't get a snapshot for each hour.
