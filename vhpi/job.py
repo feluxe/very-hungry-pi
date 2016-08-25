@@ -306,7 +306,7 @@ class Job(object):
         if not self.is_machine_online():
             log.skip_msg(False, self.due_snapshots, self.src_ip, self.src)
             output = False
-        if not self.due_snapshots:
+        elif not self.due_snapshots:
             log.skip_msg(True, self.due_snapshots, self.src_ip, self.src)
             output = False
         return output
