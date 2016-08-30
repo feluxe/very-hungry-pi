@@ -125,7 +125,7 @@ class Job(object):
                 self.exit(2)
             time.sleep(60)
 
-    # Start a watcher in a thread which checks if source machine is online each 60s.
+    # Start a watcher in a thread which checks if source machine is online, etc, each 60s.
     def start_health_monitor(self):
         health_monitor_thread = threading.Thread(target=self.health_monitor)
         health_monitor_thread.setDaemon(True)
