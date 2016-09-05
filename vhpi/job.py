@@ -113,11 +113,11 @@ class Job(object):
     def health_monitor(self):
         while self.alive:
             if not self.check_validation_file():
-                log.error('    Error: Could not validate source via '
+                log.critical('    Critical: Could not validate source via '
                           '"validation file"' + self.validation_file)
                 self.exit(2)
             if not self.check_dest():
-                log.info('    Error: Invalid Destination:' + self.dest + ': '
+                log.critical('    Critical: Invalid Destination:' + self.dest + ': '
                          + time.strftime(S.timestamp_format))
                 self.exit(2)
             if not self.is_machine_online():
@@ -145,17 +145,18 @@ class Job(object):
                                                close_fds=True,
                                                universal_newlines=True)
             output = Processes.rsync.stdout.read()
-            log.debug('    ' + output.replace('\n', '\n    '))
-            log.if_in_line('warning', 'rsync: ', output)
-            log.if_in_line('warning', 'rsync error: ', output)
-            log.if_in_line('info', 'bytes/sec', output)
-            log.if_in_line('info', 'total size is ', output)
+            if self.alive:
+                log.debug('    ' + output.replace('\n', '\n    '))
+                log.if_in_line('warning', 'rsync: ', output)
+                log.if_in_line('warning', 'rsync error: ', output)
+                log.if_in_line('info', 'bytes/sec', output)
+                log.if_in_line('info', 'total size is ', output)
         except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
             if e.returncode and e.returncode != 23:
                 log.warning('    Error: Unknown Rsync Exit Code')
                 return_val = False
         Processes.rsync = None
-        log.debug_ts_msg('End: rsync execution.\n')
+        log.debug_ts_msg('End: rsync execution.\n') if self.alive else None
         return return_val
 
     @staticmethod
@@ -311,7 +312,7 @@ class Job(object):
             output = False
         return output
 
-    def exit(self, code):
+    def exit(self, code, msg=None, level=None):
         kill_processes()
         self.alive = False
         log.job_out(code, self.init_time)

@@ -84,13 +84,14 @@ def check_path(path):
 
 
 def kill_processes():
-    p = Processes
-    if p.rsync:
-        p.rsync.kill()
-        p.rsync = None
-    if p.cp:
-        p.cp.kill()
-        p.cp = None
+    if Processes.rsync:
+        log.debug('    Info: Killing rsync process.')
+        Processes.rsync.kill()
+        Processes.rsync = None
+    if Processes.cp:
+        log.debug('    Info: Killing cp process.')
+        Processes.cp.kill()
+        Processes.cp = None
 
 
 def exit_main():

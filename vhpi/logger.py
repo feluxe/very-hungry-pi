@@ -27,7 +27,6 @@ from .settings import Settings as S
 
 
 class Log(object):
-
     def __init__(self, name):
         self.logger = self.init_logger(name)
 
