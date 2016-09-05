@@ -82,7 +82,7 @@ def main():
         exit_main()
     except Exception as err:
         log.error('Error: An Exception was thrown.')
-        log.error(str(err))
+        log.error(err)
         exit_main()
 
 
