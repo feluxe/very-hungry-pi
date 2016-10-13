@@ -1,6 +1,6 @@
 
 
-
+Add feature for exclude lists as external files.
 
 Was ist eigentlich mit spaces in exclude paths. Das könnte ein Problem sein:
     rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found --exclude=.cache/chromium --exclude=.mozilla/firefox/*/Cache --exclude=.IntelliJIdea2016.1 --exclude=.config --exclude=.thunderbird /src ...

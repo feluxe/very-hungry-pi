@@ -21,6 +21,9 @@
 # This module contains the logic and routines that are needed to create a backup from a source
 # directory.
 
+# TODO: Extract healt mointor from class and make it a new module.
+# TODO: make_snapshots new module and rename to create_snapshot.
+
 import datetime
 import subprocess
 import glob
@@ -35,7 +38,6 @@ from .processes import Processes
 
 
 class Job(object):
-
     def __init__(self, _job_cfg):
         self.alive = True
         self.src_ip = _job_cfg['source_ip']
@@ -50,10 +52,10 @@ class Job(object):
         self.due_snapshots = self.get_due_snapshots(self.snapshots,
                                                     self.timestamps,
                                                     S.intervals)
-        self.rsync_command = self.build_rsync_command(self.rsync_options,
-                                                      self.excludes,
-                                                      self.src,
-                                                      self.dest)
+        self.rsync_command = self.get_rsync_command(self.rsync_options,
+                                                    self.excludes,
+                                                    self.src,
+                                                    self.dest)
         self.init_time = None
         self.validation_file = clean_path(self.src + "/" + S.validation_file)
 
@@ -67,22 +69,29 @@ class Job(object):
                 timestamps.update({interval: 0})
         return timestamps
 
+    @staticmethod
+    # Determine if a snapshot is due.
+    def is_due(_type, intervals, timestamp):
+        if _type not in intervals:
+            log.critical("    Critical: No time interval set for type: " + _type)
+            exit_main()
+        cycle_time = intervals[_type]
+        if not isinstance(timestamp, str) or not timestamp:
+            timestamp = '1970-01-01 00:00:00'
+        _format = "%Y-%m-%d %H:%M:%S"
+        timestamp = time.mktime(datetime.datetime.strptime(timestamp, _format).timetuple())
+        time_now = int(time.time())
+        if time_now - cycle_time >= timestamp:
+            return True
+        else:
+            return False
+
     # Get due Snapshots
     def get_due_snapshots(self, _snapshots, timestamps, intervals):
         due = [interval for interval in _snapshots
                if _snapshots[interval] and
                self.is_due(interval, intervals, timestamps[interval])]
         return due
-
-    def check_validation_file(self):
-        if not check_path(self.validation_file) == 'file':
-            return False
-        return True
-
-    def check_dest(self):
-        if not check_path(self.dest) == 'dir':
-            return False
-        return True
 
     @staticmethod
     def get_excludes(excludes, excl_lists, excl_lib):
@@ -93,12 +102,43 @@ class Job(object):
 
     # build rsync command for subprocess module.
     @staticmethod
-    def build_rsync_command(options, excludes, src, dest):
+    def get_rsync_command(options, excludes, src, dest):
         options = options.split()
         excludes = ['--exclude=' + item for item in excludes]
         src = clean_path(src)
         dest = clean_path(dest + '/backup.latest')
         return ['rsync'] + options + excludes + [src, dest]
+
+    # Get all deprecated snapshot dirs.
+    # Dirs that contain snapshots that are older than what the user wants to keep.
+    # The keep range is defined in config.
+    @staticmethod
+    def get_deprecated_dirs(dest, snapshot, snapshots):
+        deprecated = []
+        base_dir = clean_path(dest + '/' + snapshot + ".")
+        keep_range = range(snapshots[snapshot] - 2, -1, -1)
+        active = [base_dir + str(num) for num in keep_range]
+        active.append(base_dir + '0.tmp')
+        deprecated.extend([_dir for _dir in glob.glob(base_dir + '*') if _dir not in active])
+        return deprecated
+
+    def exit(self, code, msg=None, level=None):
+        kill_processes()
+        self.alive = False
+        log.job_out(code, self.init_time)
+
+
+    # HEALTH MONITOR MODULE
+
+    def check_dest(self):
+        if not check_path(self.dest) == 'dir':
+            return False
+        return True
+
+    def check_validation_file(self):
+        if not check_path(self.validation_file) == 'file':
+            return False
+        return True
 
     # check if machine is online.
     def is_machine_online(self):
@@ -114,11 +154,11 @@ class Job(object):
         while self.alive:
             if not self.check_validation_file():
                 log.critical('    Critical: Could not validate source via '
-                          '"validation file"' + self.validation_file)
+                             '"validation file"' + self.validation_file)
                 self.exit(2)
             if not self.check_dest():
                 log.critical('    Critical: Invalid Destination:' + self.dest + ': '
-                         + time.strftime(S.timestamp_format))
+                             + time.strftime(S.timestamp_format))
                 self.exit(2)
             if not self.is_machine_online():
                 log.info('    Error: Source went offline: ' + time.strftime(S.timestamp_format))
@@ -130,6 +170,18 @@ class Job(object):
         health_monitor_thread = threading.Thread(target=self.health_monitor)
         health_monitor_thread.setDaemon(True)
         health_monitor_thread.start()
+
+    def check_readiness(self):
+        output = True
+        if not self.is_machine_online():
+            log.skip_msg(False, self.due_snapshots, self.src_ip, self.src)
+            output = False
+        elif not self.due_snapshots:
+            log.skip_msg(True, self.due_snapshots, self.src_ip, self.src)
+            output = False
+        return output
+
+    # RSYNC MODULE
 
     # execute rsync command.
     def exec_rsync(self):
@@ -159,35 +211,7 @@ class Job(object):
         log.debug_ts_msg('End: rsync execution.\n') if self.alive else None
         return return_val
 
-    @staticmethod
-    # Determine if a snapshot is due.
-    def is_due(_type, intervals, timestamp):
-        if _type not in intervals:
-            log.critical("    Critical: No time interval set for type: " + _type)
-            exit_main()
-        cycle_time = intervals[_type]
-        if not isinstance(timestamp, str) or not timestamp:
-            timestamp = '1970-01-01 00:00:00'
-        _format = "%Y-%m-%d %H:%M:%S"
-        timestamp = time.mktime(datetime.datetime.strptime(timestamp, _format).timetuple())
-        time_now = int(time.time())
-        if time_now - cycle_time >= timestamp:
-            return True
-        else:
-            return False
-
-    # Get all deprecated snapshot dirs.
-    # Dirs that contain snapshots that are older than what the user wants to keep.
-    # The keep range is defined in config.
-    @staticmethod
-    def get_deprecated_dirs(dest, snapshot, snapshots):
-        deprecated = []
-        base_dir = clean_path(dest + '/' + snapshot + ".")
-        keep_range = range(snapshots[snapshot] - 2, -1, -1)
-        active = [base_dir + str(num) for num in keep_range]
-        active.append(base_dir + '0.tmp')
-        deprecated.extend([_dir for _dir in glob.glob(base_dir + '*') if _dir not in active])
-        return deprecated
+    # Create Snapshots module
 
     # Delete deprecated snapshot directories.
     def del_deprecated_snaps(self, dest, snapshot, snapshots):
@@ -301,18 +325,3 @@ class Job(object):
         log.debug_ts_msg('End: processing snapshots.')
         log.info('')
         return output
-
-    def check_readiness(self):
-        output = True
-        if not self.is_machine_online():
-            log.skip_msg(False, self.due_snapshots, self.src_ip, self.src)
-            output = False
-        elif not self.due_snapshots:
-            log.skip_msg(True, self.due_snapshots, self.src_ip, self.src)
-            output = False
-        return output
-
-    def exit(self, code, msg=None, level=None):
-        kill_processes()
-        self.alive = False
-        log.job_out(code, self.init_time)
