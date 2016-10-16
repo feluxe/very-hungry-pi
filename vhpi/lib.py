@@ -31,16 +31,12 @@ from .processes import Processes
 # load Yaml
 def load_yaml(file, create_new=False):
     output = None
-    file_dir = os.path.dirname(file)
-    if not check_path(file_dir) == 'dir':
-        log.critical('    Error: Could not find dir :' + file_dir)
-        exit_main()
     try:
         with open(file, 'r') as stream:
             output = yaml.safe_load(stream)
     except FileNotFoundError:
         if not create_new:
-            log.critical('    Error: Could not read file :' + file)
+            log.critical('    Error: Could not find YAML file :' + file)
             exit_main()
         output = open(file, 'w+')
     except IOError as e:
