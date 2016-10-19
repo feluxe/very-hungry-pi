@@ -5,6 +5,7 @@ venv/
 __pycache__/
 vhpi/tests/dummy_dest/
 lock
+assets/sources/
 
 ### Wheels ###
 build/
