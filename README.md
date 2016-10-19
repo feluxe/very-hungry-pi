@@ -1,5 +1,4 @@
 # Very Hungry Pi
-<img src="assets/logo_vhpi.jpg" alt="Logo" style="width: 200px;" /><br>
 <img src="assets/slideshow.gif" alt="slideshow" />
 
 ## Contents
