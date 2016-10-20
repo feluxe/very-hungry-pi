@@ -1,5 +1,8 @@
 
 
+New Topic in Readme: 'Example Usage Scenario' Siehe cb post.
+
+
 Add feature for exclude lists as external files.
 
 Was ist eigentlich mit spaces in exclude paths. Das könnte ein Problem sein:

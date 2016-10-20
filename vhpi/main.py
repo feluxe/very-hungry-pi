@@ -21,6 +21,7 @@
 import fcntl
 import sys
 import time
+import traceback
 
 from vhpi.job import Job
 from .lib import exit_main, load_yaml
@@ -80,9 +81,11 @@ def main():
     except KeyboardInterrupt:
         log.error('Error: Backup aborted by user.')
         exit_main()
-    except Exception as err:
+    except Exception:
         log.error('Error: An Exception was thrown.')
-        log.error(err)
+        print("-"*60)
+        traceback.print_exc()
+        print("-"*60)
         exit_main()
 
 
