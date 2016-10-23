@@ -37,6 +37,7 @@ from .lib import clean_path, load_yaml, check_path, write_yaml, kill_processes, 
 from .processes import Processes
 
 
+
 class Job(object):
     def __init__(self, _job_cfg):
         self.alive = True
