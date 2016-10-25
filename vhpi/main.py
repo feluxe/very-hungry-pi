@@ -84,7 +84,7 @@ def main():
     except Exception:
         log.error('Error: An Exception was thrown.')
         log.error("-" * 60)
-        log.error(traceback.print_exc())
+        log.error(traceback.format_exc())
         log.error("-" * 60)
         exit_main()
 
