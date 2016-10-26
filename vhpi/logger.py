@@ -54,7 +54,7 @@ class Log(object):
                    for s in lines if needle in s]
         matches_str = '\n'.join(matches)
         dynamic_func = getattr(self.logger, level)
-        dynamic_func(matches_str)
+        dynamic_func(matches_str) if len(matches) > 0 else None
 
     def job_in(self, ip, src, due_snapshots):
         log_msg = ' [Executing] ' + ip + '\t' + src + '\n'

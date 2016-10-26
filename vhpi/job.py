@@ -198,20 +198,30 @@ class Job(object):
                                                stderr=subprocess.STDOUT,
                                                close_fds=True,
                                                universal_newlines=True)
+            # use rsync log entries in vhpi's log.
             output = Processes.rsync.stdout.read()
             if self.alive:
+                log.debug('\n    [Rsync Log]:')
                 log.debug('    ' + output.replace('\n', '\n    '))
+                log.info('\n    [Rsync Log Summary]:')
+                log.if_in_line('error', 'error: ', output)
                 log.if_in_line('warning', 'rsync: ', output)
-                log.if_in_line('warning', 'rsync error: ', output)
+                log.if_in_line('warning', 'warning: ', output)
                 log.if_in_line('info', 'bytes/sec', output)
                 log.if_in_line('info', 'total size is ', output)
-        except Processes.rsync.CalledProcessError as e:
-            if e.returncode and e.returncode == 20:
-                log.warning('    Warning: Skipping current job due to rsync exit code (20)')
+                log.info('')
+
+            # handle rsync exit codes
+            Processes.rsync.communicate()
+            return_code = Processes.rsync.wait()
+            if return_code == 20:
+                log.info('    Info: Skipping current job due to rsync exit code (20)\n')
                 return_val = False
-            elif e.returncode and e.returncode != 23:
-                log.warning('    Error: Unknown Rsync Exit Code')
-                return_val = False
+
+        except Processes.rsync.SubprocessError as e:
+            log.error('    Error: An error occurred in rsync subprocess.')
+            log.debug(e)
+            return_val = False
         Processes.rsync = None
         log.debug_ts_msg('End: rsync execution.\n') if self.alive else None
         return return_val
@@ -286,9 +296,19 @@ class Job(object):
             output = Processes.cp.stdout.read()
             if output:
                 log.debug(output)
-        except Processes.cp.CalledProcessError as e:
+
+            # handle cp exit codes
+            Processes.cp.communicate()
+            return_code = Processes.cp.wait()
+            if return_code != 0:
+                log.error('    Error: Could not create hardlinks for: ' + src)
+                log.info('    Info: Skipping current job due to cp exit code not being 0')
+                return_val = False
+
+        except Processes.cp.SubprocessError as e:
+            log.critical('    Critical Error: An error occurred in cp subprocess.')
+            log.critical('    Critical Error: Could not create hardlinks for: ' + src)
             log.debug(e)
-            log.error('    Critical Error: Could not create hardlinks for: ' + src)
             return_val = False
         Processes.cp = None
         return return_val
