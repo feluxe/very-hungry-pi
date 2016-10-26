@@ -206,7 +206,7 @@ class Job(object):
             if e.returncode and e.returncode == 20:
                 log.warning('    Warning: Skipping current job due to rsync exit code (20)')
                 return_val = False
-            if e.returncode and e.returncode != 23:
+            elif e.returncode and e.returncode != 23:
                 log.warning('    Error: Unknown Rsync Exit Code')
                 return_val = False
         Processes.rsync = None
