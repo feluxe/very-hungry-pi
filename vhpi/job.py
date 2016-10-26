@@ -37,7 +37,6 @@ from .lib import clean_path, load_yaml, check_path, write_yaml, kill_processes, 
 from .processes import Processes
 
 
-
 class Job(object):
     def __init__(self, _job_cfg):
         self.alive = True
@@ -128,7 +127,6 @@ class Job(object):
         self.alive = False
         log.job_out(code, self.init_time)
 
-
     # HEALTH MONITOR MODULE
 
     def check_dest(self):
@@ -204,7 +202,10 @@ class Job(object):
                 log.if_in_line('warning', 'rsync error: ', output)
                 log.if_in_line('info', 'bytes/sec', output)
                 log.if_in_line('info', 'total size is ', output)
-        except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
+        except Processes.rsync.CalledProcessError as e:
+            if e.returncode and e.returncode == 20:
+                log.warning('    Warning: Skipping current job due to rsync exit code (20)')
+                return_val = False
             if e.returncode and e.returncode != 23:
                 log.warning('    Error: Unknown Rsync Exit Code')
                 return_val = False
