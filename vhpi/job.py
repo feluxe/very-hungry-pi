@@ -205,6 +205,7 @@ class Job(object):
                 log.debug('    ' + output.replace('\n', '\n    '))
                 log.info('\n    [Rsync Log Summary]:')
                 log.if_in_line('error', 'error: ', output)
+                log.if_in_line('error', 'IO error', output)
                 log.if_in_line('warning', 'rsync: ', output)
                 log.if_in_line('warning', 'warning: ', output)
                 log.if_in_line('info', 'bytes/sec', output)
