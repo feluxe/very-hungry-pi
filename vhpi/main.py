@@ -63,6 +63,7 @@ def exec_app():
         if not job.check_readiness():  # Check if any snapshot due and machine online.
             continue
         log.job_in(job.src_ip, job.src, job.due_snapshots)
+        job.health_check_routine()
         job.start_health_monitor()
         if job.alive and not job.exec_rsync():
             job.exit(2)

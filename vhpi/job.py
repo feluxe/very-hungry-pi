@@ -148,20 +148,23 @@ class Job(object):
         except subprocess.CalledProcessError:
             return False
 
+    def health_check_routine(self):
+        if not self.check_validation_file():
+            log.critical('    Critical: Could not validate source via '
+                         '"validation file"' + self.validation_file)
+            self.exit(2)
+        if not self.check_dest():
+            log.critical('    Critical: Invalid Destination:' + self.dest + ': '
+                         + time.strftime(S.timestamp_format))
+            self.exit(2)
+        if not self.is_machine_online():
+            log.info('    Error: Source went offline: ' + time.strftime(S.timestamp_format))
+            self.exit(2)
+
     # Check if source is online repeatedly. If it goes offline exit program.
     def health_monitor(self):
         while self.alive:
-            if not self.check_validation_file():
-                log.critical('    Critical: Could not validate source via '
-                             '"validation file"' + self.validation_file)
-                self.exit(2)
-            if not self.check_dest():
-                log.critical('    Critical: Invalid Destination:' + self.dest + ': '
-                             + time.strftime(S.timestamp_format))
-                self.exit(2)
-            if not self.is_machine_online():
-                log.info('    Error: Source went offline: ' + time.strftime(S.timestamp_format))
-                self.exit(2)
+            self.health_check_routine()
             time.sleep(60)
 
     # Start a watcher in a thread which checks if source machine is online, etc, each 60s.
