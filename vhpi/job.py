@@ -283,7 +283,7 @@ class Job(object):
             output = Processes.cp.stdout.read()
             if output:
                 log.debug(output)
-        except (subprocess.SubprocessError, subprocess.CalledProcessError) as e:
+        except Processes.cp.CalledProcessError as e:
             log.debug(e)
             log.error('    Critical Error: Could not create hardlinks for: ' + src)
             return_val = False
