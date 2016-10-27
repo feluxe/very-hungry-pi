@@ -65,7 +65,7 @@ class Log(object):
     def job_out(self, code, _t, message=''):
         seconds = time.time() - _t
         duration = time.strftime('%H:%M:%S', time.gmtime(seconds))
-        new_msg = '\n'
+        new_msg = ''
         if code == 0:
             new_msg += '[Completed] after: ' + duration + ' (h:m:s)' + message
         elif code == 1:
@@ -74,7 +74,7 @@ class Log(object):
             new_msg += '[Failed] after: ' + duration + ' (h:m:s)' + message
         else:
             new_msg += '[Job Result Unknown] after: ' + duration + ' (h:m:s)' + message
-        self.logger.info(time.strftime(S.timestamp_format) + ' ' + new_msg)
+        self.logger.info('\n' + time.strftime(S.timestamp_format) + ' ' + new_msg)
 
     def debug_ts_msg(self, message=''):
         self.logger.debug('    ' + time.strftime(S.timestamp_format) + ' ' + message)

@@ -216,7 +216,7 @@ class Job(object):
             Processes.rsync.communicate()
             return_code = Processes.rsync.wait()
             if return_code == 20:
-                log.info('    Info: Skipping current job due to rsync exit code (20)\n')
+                log.info('    Info: Skipping current job due to rsync exit code (20)')
                 return_val = False
 
         except Processes.rsync.SubprocessError as e:
