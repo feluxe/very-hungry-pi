@@ -12,19 +12,19 @@
 With **vhpi** you can turn your Raspberry Pi into a silent backup farm for your Network.
 *Vhpi* creates [incremental](https://en.wikipedia.org/wiki/Incremental_backup) [snapshot](https://github.com/feluxe/very_hungry_pi/wiki/Snapshots-explanation) backups of available network shares (e.g. [NFS](https://en.wikipedia.org/wiki/Network_File_System), [Samba](https://en.wikipedia.org/wiki/Samba_(software))) silently and automated with a minimum of disk space required.
 *Vhpi* runs entirely on 'server-side'; clients only need to share/export backup sources with the Pi and let the Pi run the backups in the background. 
-*Vhpi* uses [rsync](https://en.wikipedia.org/wiki/Rsync) to create the backups and [cp](https://en.wikipedia.org/wiki/Cp_(Unix)) to create hardlinks for the snapshots. 
-To get the most control over the backups *vhpi* takes raw [rsync options](https://linux.die.net/man/1/rsync) for configuration.
+*Vhpi* uses battle proven tools like [rsync](https://en.wikipedia.org/wiki/Rsync) to create the backups and [cp](https://en.wikipedia.org/wiki/Cp_(Unix)) to create hardlinks for the snapshots. 
+To get the most control over the backups *vhpi* takes raw [rsync options](https://download.samba.org/pub/rsync/rsync.html) for configuration.
 *Vhpi* writes two log files: one for a short overview of the entire process ([info.log exmpl.](examples/log/info.log)) and one for debugging ([debug.log exmpl.](examples/log/debug.log)).
 
-More details about the script (if you are interested): ['What the script does in detail'](https://github.com/feluxe/very_hungry_pi/wiki/What-the-script-does-in-detail).
+More details about the script in the wiki: ['What the script does in detail'](https://github.com/feluxe/very_hungry_pi/wiki/What-the-script-does-in-detail).
 
-TL;DR: Just setup vhpi, run your Pi 24/7 and don't care about backups no more.
+**TL;DR:** Just setup vhpi, run your Pi 24/7 and don't care about backups no more.
 <br>
 
 ## <a name="features"></a> Features
 
-* *Vhpi* works with any rsync command you like. This gives you a wide variety of configuration  options for your backup.
-* You can create multiple *exclude-lists* to exclude files/dirs from the backup. (See 'exclude_lib' in [Example Config](#example_config)) 
+* *Vhpi* works with any rsync command you like. This gives you a wide and well documented variety of configuration options for your backup.
+* You can create multiple *exclude-lists* to exclude files/dirs from the backup. (See 'exclude_lib' in [Example Config](#example_config))
 * *Vhpi* creates [snapshots](https://github.com/feluxe/very_hungry_pi/wiki/Snapshots-explanation) for any time-interval you like. (e.g. 'hourly', 'daily', 'weekly', 'monthly', 'each-4-hours', 'half-yearly', etc...) Just add the interval name and its duration in seconds to the config. (See 'intervals' in [Example Config](#example_config)).
 * You can set the amount of snapshots that you want keep for each used interval.
     E.g. if you want to keep 3 snapshots for the 'hourly' interval you get three snapshot dirs: `hourly.0`, `hourly.1`, `hourly.2`. Each snapshot reaches an hour further into the past.
@@ -32,7 +32,8 @@ TL;DR: Just setup vhpi, run your Pi 24/7 and don't care about backups no more.
     * because the backups are created incrementally. 
     * because *vhpi* creates new snapshots as 'hard links' for all files that haven't changed. (No duplicate files.. just links)
 * The process is nicely logged ('info.log', 'debug.log').
-* If a backup process takes a long time, *vhpi* blocks any attempt to start a new backup process until the first one has finished to prevent the Pi from overloading. 
+* If a backup process takes a long time, *vhpi* blocks any attempt to start a new backup process until the first one has finished to prevent the Pi from overloading.
+* More features are planned (See: [Version Overvire](https://github.com/feluxe/very_hungry_pi/wiki/Version-Overview-(TODOs)))
 
 ##<a name="requirements"></a> Requirements:
 
@@ -42,7 +43,9 @@ TL;DR: Just setup vhpi, run your Pi 24/7 and don't care about backups no more.
 ## <a name="example_config"></a> Example Config 
 
  ```yaml  
-# Basic App config:
+# Basic App Settings
+########################################################################
+
 app_cfg:
   # Add default lists for exclude files under exclude_lib.
   # You can use exclude lists for a job if you  add them under jobs_cfg -> exclude_list
@@ -70,7 +73,10 @@ app_cfg:
     yearly: 31536000
   }
 
-# Add configuration for each backup source here.
+# Backup Jobs
+# Configure each backup source here.
+########################################################################
+
 jobs_cfg:
 
   # Source 1:
