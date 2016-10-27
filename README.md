@@ -162,13 +162,13 @@ $ touch /path/to/src1/.backup_valid
 ### Test the configuration 
 
 If you are not already familiar with **rsync**, have a little advice on how to configure a first test-run.
-If you run vhpi for the first time you should use the rsync `--dry-run` flag.  That way the backup is just simulated. This is from the rsync manual:
+If you run vhpi for the first time you should use the rsync `--dry-run` flag. That way the backup is just simulated. This is from the rsync manual:
 
 ```
 -n, --dry-run               perform a trial run with no changes made
 ```
 
-So a good command to test the config would be `rsync -avn --delete`
+So a good setting for `rsync_options` (see [Example Config](#example_config))) to test the config would be `-avn --delete`
 `-a` = archive mode. This is the standard backup mode for rsync. 
 `-v` = verbose mode. This option increases the amount of log information rsync gives you during execution.
 `-n` = dry-run. See above.
@@ -176,14 +176,14 @@ So a good command to test the config would be `rsync -avn --delete`
  
 More on rsync options can be found here: http://linux.die.net/man/1/rsync
  
-Now you should be ready to test-run vhpi manually like that:
 If you think your configuration is fine and good to go for a test run open your terminal and run vhpi manually like this:
+
  ```
  $ cd /opt/very_hungry_pi/
  $ python3 -m vhpi.main
  ```
  If you get an error try to adjust the config. If you think there is a bug use the github issue tracker.
- You can find the results of each execution in the log files as well (.very_hungry_pi/debug.log and .very_hungry_pi/info.log)
+ You can find the results of each execution in the log files as well (`.very_hungry_pi/debug.log` and `.very_hungry_pi/info.log`)
  If your configuration works like you expected, you should create a cronjob to make your Pi run vhpi automatically. (see the next step.)
  
 
