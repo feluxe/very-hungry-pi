@@ -4,6 +4,6 @@
 # Any Process that is spawn should sit on a variable in this module, that way each process is
 # globally available.
 
-class Processes(object):
-    rsync = None
-    cp = None
+rsync = None
+cp = None
+rm = None

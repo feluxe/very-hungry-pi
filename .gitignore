@@ -5,7 +5,10 @@ venv/
 __pycache__/
 vhpi/tests/dummy_dest/
 lock
-assets/sources/
+fiddle.py
+
+vhpi_stable/
+vhpi_wirr/
 
 ### Wheels ###
 build/
