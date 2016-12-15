@@ -84,8 +84,7 @@ class Log(object):
         path = '[' + fixed_str_len(path, 50, '·') + ']  '
         online = 'online' if online else 'offline'
         online = 'Source ' + fixed_str_len(online, 7, ' ') + ' | '
-        due_jobs_sorted = due_jobs if len(due_jobs) <= 1 else due_jobs.sort()
-        due = 'Due: ' + ', '.join(due_jobs_sorted) + '\t' if due_jobs else 'No due jobs\t'
+        due = 'Due: ' + ', '.join(due_jobs.sort()) + '\t' if due_jobs else 'No due jobs\t'
         msg = '[Skipped] ' + ip + path + online + due
         self.logger.info(time.strftime(S.timestamp_format) + ' ' + msg)
 
