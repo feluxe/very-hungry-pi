@@ -1,0 +1,64 @@
+
+# Basic App config:
+app_cfg:
+  # Add default lists for exclude files under exclude_lib.
+  # You can use exclude lists for a job if you  add them under jobs_cfg -> exclude_list
+  exclude_lib:
+    standard: [
+      lost+found,
+      .cache/chromium,
+      .mozilla/firefox/*/Cache,
+      .IntelliJIdea2016.1,
+      .config,
+      .thunderbird
+    ]
+  # Define any interval you want e.g. 'hourly: 3600'*:
+  # Feel free to use your own definitions like 'every_four_hours' etc.
+  # Value must be in Seconds.
+  intervals: {
+    hourly: 3600,
+    quarter_daily: 21600,
+    daily: 86400,
+    weekly: 604800,
+    monthly: 2592000,
+    yearly: 31536000
+  }
+jobs:
+
+  - name: name1
+    source_ip: 192.168.178.20
+    rsync_src: dummy_files/manual_tests/src/src1
+    rsync_dst: dummy_files/manual_tests/dst/dst1
+    rsync_options: -aAHSvX --delete
+    exclude_lists: [
+      standard
+    ]
+    excludes: [
+      downloads
+    ]
+    snapshots:
+      hourly: 6
+      quarter_daily: 0
+      daily: 7
+      weekly: 4
+      monthly: 6
+      yearly: 3
+
+  - name: name2
+    source_ip: 192.168.178.20
+    rsync_src:  dummy_files/manual_tests/src/src2
+    rsync_dst: dummy_files/manual_tests/dst/dst2
+    rsync_options: -aAHSvX --delete
+    exclude_lists: [
+      standard
+    ]
+    excludes: [
+      lala
+    ]
+    snapshots:
+      hourly: 0
+      quarter_daily: 0
+      daily: 0
+      weekly: 0
+      monthly: 1
+      yearly: 1

@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+import sys
+import os
+
+
+# Add project to path
+real_path = os.path.realpath(__file__)
+project_dir = os.path.dirname(os.path.dirname(real_path))
+sys.path.append(project_dir)
+
+# Ecexute vhpi
+from vhpi import exec
+
+exec

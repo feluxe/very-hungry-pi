@@ -25,6 +25,7 @@ that are also useful for external consumption.
 """
 
 import os
+import yaml
 
 
 def clean_path(_path):
@@ -47,3 +48,7 @@ def check_path(path):
             return False
 
 
+# load Yaml
+def load_yaml(file):
+    with open(file, 'r') as stream:
+        return yaml.safe_load(stream)

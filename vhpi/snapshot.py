@@ -18,7 +18,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import subprocess
+import subprocess as sub
 import glob
 
 from vhpi.logging import logger as log, ts_msg
@@ -27,38 +27,25 @@ import vhpi.processes as processes
 
 
 def remove(_dir):
-    """Remove Snapshot directory. Uses unix rm instead of shutil.rmtree for better performance.
+    """Remove Snapshot directory.
+    Uses unix rm instead of shutil.rmtree for better performance.
     :param _dir:
     """
-    log.debug(ts_msg(2, 'Removing snapshot: ' + _dir.split('/')[-1]))
-    try:
-        processes.rm = subprocess.check_output(['rm', '-rf', _dir])
-    except processes.rm.CalledProcessError as e:
-        log.debug(e)
-        log.critical('    Critical Error: Could not remove : ' + _dir)
+    log.debug(ts_msg(4, '  Remove snapshot: ' + _dir.split('/')[-1]))
+    processes.rm = sub.check_output(['rm', '-rf', _dir])
 
 
-def create_hardlinks(src, dest):
+def create_hardlinks(src, dst):
     """Create hard-links with unix cp tool."""
-    if os.path.exists(dest):
-        raise FileExistsError('Destination already exists.')
-    log.debug(ts_msg(2, 'Making links from: ' + src.split('/')[-1] + ' to ' + dest.split('/')[-1]))
-    processes.cp = subprocess.Popen(['cp', '-al', src, dest],
-                                    shell=False,
-                                    stdin=subprocess.PIPE,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT,
-                                    close_fds=True,
-                                    universal_newlines=True)
+    log.debug(ts_msg(4, '  Create hardlinks: ' + src.split('/')[-1] + ' to ' + dst.split('/')[-1]))
+    cmd = ['cp', '-al', src, dst]
+    processes.cp = sub.Popen(cmd, shell=False,
+                             stdin=sub.PIPE,
+                             stdout=sub.PIPE,
+                             stderr=sub.STDOUT,
+                             universal_newlines=True)
     output = processes.cp.stdout.read()
-    if output:
-        log.debug(output)
-
-    # handle cp exit codes
-    processes.cp.communicate()
-    return_code = processes.cp.wait()
-    if return_code != 0:
-        log.error('    Error: Could not create hardlinks for: ' + src)
+    log.debug('\n    ' + output) if output else None
     processes.cp = None
 
 
@@ -68,19 +55,10 @@ def shift(interval, _dir):
     :param _dir: The directory which contains the snapshots.
     :return:
     """
-    log.debug(ts_msg(2, 'Shifting snapshots.'))
+    log.debug(ts_msg(4, '  Shift snapshot "' + interval + '" for ' + _dir))
     base_name = clean_path(_dir + '/' + interval + '.')
-    if check_path(base_name + '0') != 'dir':
-        print(base_name + '0')
-        log.debug(ts_msg(2, 'No Snapshot found. No shift necessary.'))
-        return
-    for i in reversed(range(0, len(glob.glob(base_name + '[0-9]')))):
-        try:
-            os.rename(base_name + str(i), base_name + str(i + 1))
-        except OSError as e:
-            log.debug(e)
-            log.critical(4 * ' ' + 'Critical Error: Could not rename dir: '
-                         + base_name + str(i)) + '==> ' + str(i + 1)
+    for i in reversed(range(0, len(glob.glob(base_name + '*[0-9]')))):
+        os.rename(base_name + str(i), base_name + str(i + 1))
 
 
 def make(interval, src):
@@ -88,14 +66,10 @@ def make(interval, src):
     :param interval: str. E.g.: 'hourly', 'daily', etc.
     :param src: The source dir. Usually the latest backup
     """
-    log.debug(ts_msg(2, 'Making snapshot: ' + interval + ' of ' + src))
-    try:
-        parent_dir = os.path.dirname(src)
-        snap_dir = clean_path(parent_dir + '/' + interval + '.0')
-        remove(snap_dir + '.tmp')
-        create_hardlinks(src, snap_dir + '.tmp')
-        shift(interval, parent_dir) if os.path.exists(snap_dir) else None
-        os.rename(snap_dir + '.tmp', snap_dir)
-    except Exception as e:
-        raise RuntimeError(e)
-
+    log.debug(ts_msg(4, 'Start snapshot sequence: "' + interval + '" for: ' + src))
+    parent_dir = os.path.dirname(src)
+    snap_dir = clean_path(parent_dir + '/' + interval + '.0')
+    remove(snap_dir + '.tmp')
+    create_hardlinks(src, snap_dir + '.tmp')
+    shift(interval, parent_dir) if os.path.exists(snap_dir) else None
+    os.rename(snap_dir + '.tmp', snap_dir)

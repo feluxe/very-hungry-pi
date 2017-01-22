@@ -21,9 +21,9 @@ app_cfg:
     yearly: 31536000
   }
 
-jobs_cfg:
-
-  - source_ip: 192.168.178.20
+jobs:
+  - name: name1
+    source_ip: 192.168.178.20
     rsync_src: tests/dummy_src/src1/
     rsync_dest: tests/dummy_dest/dest1/
     rsync_options: -aAHSvX --delete

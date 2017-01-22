@@ -6,6 +6,11 @@ __pycache__/
 vhpi/tests/dummy_dest/
 lock
 fiddle.py
+fmw_TODO.md
+.pycre
+vhpi.egg-info/
+.swp
+**/tmp/*
 
 vhpi_stable/
 vhpi_wirr/
@@ -19,3 +24,5 @@ dist/
 .idea/
 
 debian/
+
+
