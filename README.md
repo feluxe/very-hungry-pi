@@ -106,7 +106,7 @@ jobs:
 ## <a name="install"></a> Installation & Configuration
 
 
-### Sharing backup sources with the Pi:
+### Sharing sources with the Pi:
 
 Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba` (There are plenty tutorials for this on the www).
 Perhaps *vhpi* can also create local backups as well.
@@ -156,6 +156,7 @@ I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so
 
 NOTICE: You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval that you use. E.g. if you want to create hourly snapshots the cronjob should run *vhpi* at least every hour, otherwise you won't get a snapshot for each hour.
  You should also keep in mind that the more frequently *vhpi* is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run *vhpi* each hour or so. That way chances are higher that you get a daily backup.
+ **TL;DR** Run it hourly.
 
 You can also add multiple cronjobs that execute *vhpi* in different intervals for different users. Thou, In most cases it would be enough to run *vhpi* hourly by root. 
 
