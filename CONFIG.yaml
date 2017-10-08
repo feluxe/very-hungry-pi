@@ -24,7 +24,7 @@ pypi:
   install_requires: ["docopt",]
   packages: ["vhpi"]
   package_dir: {"vhpi": "vhpi"}
-  package_data: {"" : ["cli/interface.txt"]}
+  package_data: {"" : ["cli/interface.txt", "examples/vhpi_cfg.yaml"]}
   py_modules: []
   data_files: []
   classifiers: []

@@ -4,18 +4,10 @@
 
 # TODO
 
-### [x] Add AGPL
 
-
-# List of Breaking Changes
-
-**config.yaml**
-
-* Rename: 'jobs_cfg' in 'jobs'
-* name filed required
-
-
-### validation file
-
-Can you not just remove it?
-Just check if job.rsync_src exists instead.
+### [] Add option in cfg to use exclude files.
+### [] Write List of Breaking Changes
+### [] Adjust README to v2.
+### [] Write Changelog.
+### [] Update Wiki files.
+### [] Inject example cfg into README via build.py.

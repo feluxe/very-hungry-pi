@@ -1,0 +1,58 @@
+# Basic App Settings:
+app_cfg:
+  # Here you can create different list of files/dirs that you want to exclude
+  # from the backup.
+  exclude_lib:
+    standard_list: [
+      lost+found/*,
+      .cache/chromium/*,
+      .mozilla/firefox/*/Cache,
+      .cache/thumbnails/*,
+      .local/share/Trash/*
+    ]
+    another_list: [
+      some_dir
+    ]
+  # Here you can define time intervals, which you may use for your snapshots.
+  # Define any interval you want e.g. 'hourly: 3600'
+  # Feel free to use your own definitions like 'every_four_hours: 14400' etc.
+  # Values must be in Seconds.
+  intervals: {
+    hourly: 3600,
+    six-hourly: 21600,
+    daily: 86400,
+    weekly: 604800,
+    monthly: 2592000,
+    yearly: 31536000
+  }
+
+# Backup Jobs Config.
+# Herer you can configure each backup source:
+jobs:
+  # Source 1:
+  - name: 'Dummy Source'
+    source_ip: '192.168.178.20'             # The ip of the computer to which the mounted src dir belongs to. If it's a local source use: "127.0.0.1" or "localhost".
+    rsync_src: '/tmp/tests/dummy_src/src1/'      # The path to the mounted or local dir.
+    rsync_dst: '/tmp/tests/dummy_dest/dest1/'    # The path to the destination dir in which each snapshot is created.
+    rsync_options: '-aAHSvX --delete'       # The options that you want to use for your rsync backup. Default is "-av". More info on rsync: http://linux.die.net/man/1/rsync
+    exclude_lists: [                        # Add exclude lists to exclude a list of file/folders. See above: app_cfg -> exclude_lib
+      standard_list,
+      another_list
+    ]
+    excludes: [                             # Add additional source specific exclude files/dirs that are not covered by the exclude lists.
+      downloads,
+      tmp
+    ]
+    snapshots:                              # Define how many snapshots you want to keep for each interval. Older snapshots are deleted automatically.
+      hourly: 6
+      six-hourly: 4
+      daily: 7
+      weekly: 4
+      monthly: 6
+      yearly: 6
+
+  # Source 2:
+  - name: 'Another Dummy Source'
+    source_ip: 192.168.178.36
+   # etc...'
+

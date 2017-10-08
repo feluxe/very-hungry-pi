@@ -14,7 +14,7 @@ With **vhpi** you can turn your Raspberry Pi into a silent backup module for you
 *Vhpi* runs entirely on 'server-side'; clients only need to share/export backup sources with the Pi and let the Pi run the backups in the background. 
 *Vhpi* uses battle proven tools like [rsync](https://en.wikipedia.org/wiki/Rsync) to create the backups and [cp](https://en.wikipedia.org/wiki/Cp_(Unix)) to create hardlinks for the snapshots. 
 To get the most control over the backups *vhpi* takes raw [rsync options](http://linux.die.net/man/1/rsync) for configuration.
-*Vhpi* writes two log files: one for a short overview of the entire process ([info.log exmpl.](examples/log/info.log)) and one for debugging ([debug.log exmpl.](examples/log/debug.log)).
+*Vhpi* writes two log files: one for a short overview of the entire process ([info.log exmpl.](vhpi/examples/info.log)) and one for debugging ([debug.log exmpl.](vhpi/examples/debug.log)).
 
 More details about the script in the wiki: ['What the script does in detail'](https://github.com/feluxe/very_hungry_pi/wiki/What-the-script-does-in-detail).
 
@@ -32,23 +32,21 @@ More details about the script in the wiki: ['What the script does in detail'](ht
     * because the backups are created incrementally. 
     * because *vhpi* creates new snapshots as 'hard links' for all files that haven't changed. (No duplicate files.. just links)
 * The process is nicely logged ('info.log', 'debug.log').
-* If a backup process takes a long time, *vhpi* blocks any attempt to start a new backup process until the first one has finished to prevent the Pi from overloading.
+* If a backup process takes long, *vhpi* blocks any attempt to start a new backup process until the first one has finished to prevent the Pi from overloading.
 * More features are planned (See: [Version Overvire](https://github.com/feluxe/very_hungry_pi/wiki/Version-Overview-(TODOs)))
 
 ##<a name="requirements"></a> Requirements:
 
-* You need Python >= 3.4 on your Pi for *vhpi* to run.
+* You need Python >= 3.6 on your Pi for *vhpi* to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
 * The file system of your Backup destination has to support hard links. (most common fs like NTFS and ext do...)
 
 ## <a name="example_config"></a> Example Config 
 
  ```yaml  
-# Basic App Settings
-########################################################################
-
+# Basic App Settings:
 app_cfg:
-  # Add default lists for exclude files under exclude_lib.
-  # You can use exclude lists for a job if you  add them under jobs_cfg -> exclude_list
+  # Here you can create different list of files/dirs that you want to exclude 
+  # from the backup.
   exclude_lib:
     standard_list: [
       lost+found/*,
@@ -73,16 +71,14 @@ app_cfg:
     yearly: 31536000
   }
 
-# Backup Jobs
-# Configure each backup source here.
-########################################################################
-
-jobs_cfg:
-
+# Backup Jobs Config.
+# Herer you can configure each backup source:
+jobs:
   # Source 1:
-  - source_ip: '192.168.178.20'             # The ip of the computer to which the mounted src dir belongs to. If it's a local source use: "127.0.0.1"
-    rsync_src: tests/dummy_src/src1/        # The path to the mounted or local dir.
-    rsync_dest: tests/dummy_dest/dest1/     # The path to the destination dir in which the snapshots are created.
+  - name: 'Dummy Source'
+    source_ip: '192.168.178.20'             # The ip of the computer to which the mounted src dir belongs to. If it's a local source use: "127.0.0.1" or "localhost".
+    rsync_src: 'tests/dummy_src/src1/'      # The path to the mounted or local dir.
+    rsync_dst: 'tests/dummy_dest/dest1/'    # The path to the destination dir in which each snapshot is created.
     rsync_options: '-aAHSvX --delete'       # The options that you want to use for your rsync backup. Default is "-av". More info on rsync: http://linux.die.net/man/1/rsync
     exclude_lists: [                        # Add exclude lists to exclude a list of file/folders. See above: app_cfg -> exclude_lib 
       standard_list,
@@ -92,18 +88,18 @@ jobs_cfg:
       downloads,
       tmp
     ]
-    snapshots:                              # Define how many snapshots you want to keep of each interval that you wish to use. Older snapshots are deleted automatically.
-      hourly: 0
-      six-hourly: 0
+    snapshots:                              # Define how many snapshots you want to keep for each interval. Older snapshots are deleted automatically.
+      hourly: 6
+      six-hourly: 4
       daily: 7
       weekly: 4
       monthly: 6
       yearly: 6
       
   # Source 2:
-  - source_ip: 192.168.178.36
-   # etc.. reapt stuff from 'Source 1'
-   
+  - name: 'Another Dummy Source'
+    source_ip: 192.168.178.36
+   # etc...'
  ```
  
 ## <a name="install"></a> Installation & Configuration
@@ -111,95 +107,69 @@ jobs_cfg:
 
 ### Share backup sources with the Pi:
 
-Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba` (There are plenty tutorials online for this common task).
-Perhaps vhpi can also create backups of your Pi's local directories too.
+Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba` (There are plenty tutorials on this in the www).
+Perhaps vhpi can also create backups of your Pi's local directories as well.
 
-You should use `autofs` or similar to automatically mount the shared directories with your Pi when ever they are available. This way you don't have to manually share them each time your Pi or a client reboots.
-
-### Get vhpi:
-
-I haven't had the time to create a .deb package for an automated setup, so for now you need to setup the script manually. Just follow the steps below.
+You should use `autofs` or similar to automatically mount the shared directories with your Pi whenever they are available. This way your Pi will automatically mount the directories when a machine enters the network.
 
 
-Either download the [zip from github](https://github.com/feluxe/very_hungry_pi/archive/master.zip) and unzip it to `/opt/very_hungry_pi`<br>
-Or clone the repository to `/opt/very_hungry_pi`.
+### Download and Install:
 
+Simples way to install VHPI is by useing pip. You need Python3.6 for VHPI to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
+After you installed Python3.6 you can run pip to install VHPI like this:
 ```
-$ cd /opt
-$ sudo git clone https://github.com/feluxe/very_hungry_pi.git
-```
-        
-### Copy config files into user's home.
-
-vhpi will look in `~/.very_hungry_pi/` for config files. Just copy them from /opt/very_hungry_pi/examples/config* to ~/.very_hungry_pi
-
-```
-$ mkdir ~/.very_hungry_pi
-$ cp -r /opt/very_hungry_pi/examples/config/* ~/.very_hungry_pi/
+$ pip3.6 install vhpi
 ```
 
-In case you want to run vhpi as `root`, you have to put the config in `/root/.very_hungry_pi`
+After that run this command to check if VHPI was isntalled successfully:
+
+```
+$ vhpi --help
+```
+It should print help text to the terminal.
+
 
 ### Configure vhpi:
 
-Just have a look at the [example config](#example_config), it is self explanatory.<br>
-The path to the config file must be this one: `~/.very_hungry_pi/config.yaml` (Like described in the step above..)
-
-
-### Create validation files
-
-Before vhpi starts a backup it validates if the source directory is readable and all good to go.
-In order to do so it looks for a hidden validation file in each source.
-You must create the validation file manually.<br>
-<br>
-Create an empty file named '.backup_valid' in the directory that you want to backup E.g.:
-
-```
-$ touch /path/to/src1/.backup_valid
-```
+Pip creates a config dir at `~/.config/vhpi/`, there you should fine a file `vhpi_cfg.yaml. This is where you configure your backup jobs.
 
 
 ### Test the configuration 
 
-If you are not already familiar with **rsync**, have a little advice on how to configure a first test-run.
-If you run vhpi for the first time you should use the rsync `--dry-run` flag. That way the backup is just simulated. This is from the rsync manual:
-
-```
--n, --dry-run               perform a trial run with no changes made
-```
+If you are not already familiar with **rsync**, here is a little info on how you can test your configuration.
+If you run vhpi for the first time you should use the rsync `--dry-run` flag. That way the backup is just simulated.
 
 So a good setting for `rsync_options` (see [Example Config](#example_config))) to test the config would be `-avn --delete`
 `-a` = archive mode. This is the standard backup mode for rsync. 
-`-v` = verbose mode. This option increases the amount of log information rsync gives you during execution.
+`-v` = verbose mode. This tells rsync to write more stuff to the log than usual.
 `-n` = dry-run. See above.
-`--delete` = This option deletes all files that are found in the backup but not in the source. This is very important. If you don't add it your snapshots will be flooded with deprecated and duplicated files. I would always use it with vhpi.
+`--delete` = This option tells rsync to delete all files/dirs that are found inside the backup dir but don't exist in your source any more. This is very important. If you don't use it, your snapshots will be flooded with deprecated and duplicated files. I use it for every backup I make.
  
-More on rsync options can be found here: http://linux.die.net/man/1/rsync
+More on rsync options here: http://linux.die.net/man/1/rsync
  
-If you think your configuration is fine and good to go for a test run open your terminal and run vhpi manually like this:
+If you think your configuration is fine and good to go for a test run, open your terminal and run vhpi manually like this:
 
  ```
- $ cd /opt/very_hungry_pi/
- $ python3 -m vhpi.main
+ $ vhpi run
  ```
- If you get an error try to adjust the config. If you think there is a bug use the github issue tracker.
- You can find the results of each execution in the log files as well (`.very_hungry_pi/debug.log` and `.very_hungry_pi/info.log`)
- If your configuration works like you expected, you should create a cronjob to make your Pi run vhpi automatically. (see the next step.)
  
+  If you get an error try to adjust the config. If you think there is a bug use the github issue tracker.
+The results of each run are saved inside the log-files as well  (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
+ If your configuration works like you wish, you should create a cronjob to make your Pi run vhpi automatically. 
 
-### <a name="create_cronjob"></a> Create a cronjob
+### <a name="create_cronjob"></a> Create a Cronjob
 
-For most convienice your Pi should create its backups automatically. A good way to make that happen is to create a cronjob, which automatically executes vhpi in an interval.
+For the most convienice your Pi should create the backups automatically. A good way to make that happen is by creating a Cronjob, which automatically executes vhpi in an interval.
 
-To run vhpi every hour you can just add the following line to `/etc/crontab`. Replace `username` with the username that is supposed to run vhpi. (in most cases that would be `root`)
+To run vhpi every hour you can add the following line to `/etc/crontab`. Replace `username` with the username that is supposed to run vhpi. (in most cases that would be `root`)
 ```
-@hourly         username   cd /opt/very_hungry_pi/ && python3 -m vhpi.main
+@hourly         username   vhpi run
 ```
 
-You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest used snapshot interval. E.g. if you want to create hourly snapshots the cronjob should run vhpi at least every hour, otherwise you won't get a snapshot for each hour.
-Another thing to keep in mind: The more frequently your cronjob starts vhpi, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours the chances are high that you won't get a backup for several days in a row, because your client machines weren't running when the cronjob executed vhpi. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run vhpi each hour or so, that way chances are higher that you get a daily backup.
+You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval. E.g. if you want to create hourly snapshots the cronjob should run vhpi at least every hour, otherwise you won't get a snapshot for each hour.
+ You should also keep in mind that the more frequently vhpi is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run vhpi each hour or so. That way chances are higher that you get a daily backup.
 
-You can also add multiple cronjobs that execute vhpi in different intervals from different users. Thou, In most cases it would be enough if you just run vhpi hourly by root. 
+You can also add multiple cronjobs that execute vhpi in different intervals for different users. Thou, In most cases it would be enough to run vhpi hourly by root. 
 
 After you added the cronjob, you should restart your Pi or restart the crontab like this:
 
@@ -207,6 +177,6 @@ After you added the cronjob, you should restart your Pi or restart the crontab l
 $ /etc/init.d/cron restart
 ```
 
-Now vhpi should start every hour and you should see some activity in the log files and of cause on your hard drive. Yay!
+If this is all done, your Pi should now run vhpi every hour and you should see some activity in the log files and of cause on your hard drive. Yay!
 
-For each newly added backup source I suggest throwing an eye on the log files every now and then until you are sure everything runs the way it should.
+Whenever you add new sources to a VHPI config, I suggest you to keep an eye on the log files util every thing runs stable.
