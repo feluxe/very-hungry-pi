@@ -1,7 +1,7 @@
 # Basic App Settings:
 app_cfg:
-  # Here you can create different list of files/dirs that you want to exclude
-  # from the backup.
+  # Create different list of files/dirs that you want to exclude from your
+  # backups.
   exclude_lib:
     standard_list: [
       lost+found/*,
@@ -13,8 +13,7 @@ app_cfg:
     another_list: [
       some_dir
     ]
-  # Here you can define time intervals, which you may use for your snapshots.
-  # Define any interval you want e.g. 'hourly: 3600'
+  # Define time intervals, which you may use for your snapshots.
   # Feel free to use your own definitions like 'every_four_hours: 14400' etc.
   # Values must be in Seconds.
   intervals: {
@@ -27,7 +26,7 @@ app_cfg:
   }
 
 # Backup Jobs Config.
-# Herer you can configure each backup source:
+# Configure each backup source here:
 jobs:
   # Source 1:
   - name: 'Dummy Source'

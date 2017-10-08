@@ -121,12 +121,12 @@ After you installed Python3.6 you can run pip to install VHPI like this:
 $ pip3.6 install vhpi
 ```
 
-After that run this command to check if VHPI was isntalled successfully:
+Run this command to check if VHPI was isntalled successfully:
 
 ```
 $ vhpi --help
 ```
-It should print help text to the terminal.
+It should print the help text to the terminal.
 
 
 ### Configure vhpi:
@@ -136,37 +136,24 @@ Pip creates a config dir at `~/.config/vhpi/`, there you should fine a file `vhp
 
 ### Test the configuration 
 
-If you are not already familiar with **rsync**, here is a little info on how you can test your configuration.
-If you run vhpi for the first time you should use the rsync `--dry-run` flag. That way the backup is just simulated.
-
-So a good setting for `rsync_options` (see [Example Config](#example_config))) to test the config would be `-avn --delete`
-`-a` = archive mode. This is the standard backup mode for rsync. 
-`-v` = verbose mode. This tells rsync to write more stuff to the log than usual.
-`-n` = dry-run. See above.
-`--delete` = This option tells rsync to delete all files/dirs that are found inside the backup dir but don't exist in your source any more. This is very important. If you don't use it, your snapshots will be flooded with deprecated and duplicated files. I use it for every backup I make.
- 
-More on rsync options here: http://linux.die.net/man/1/rsync
- 
-If you think your configuration is fine and good to go for a test run, open your terminal and run vhpi manually like this:
+In order to test VHPI I suggest setting up some some dummy backup sources to some save destinations. Maybe in the `/tmp` dir or so. Then just run this command a couple of times and see if the destionation is filled with backups/snapshots, the way you wish:
 
  ```
  $ vhpi run
  ```
  
-  If you get an error try to adjust the config. If you think there is a bug use the github issue tracker.
-The results of each run are saved inside the log-files as well  (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
- If your configuration works like you wish, you should create a cronjob to make your Pi run vhpi automatically. 
+If you get an error try to adjust the config. If you think there is a bug feel free to use the [github issue tracker](https://github.com/feluxe/very_hungry_pi/issues).
+The results of each run are added to the log-files as well (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
+ If your configuration works the way you wish, you should create a cronjob to make your Pi run vhpi automatically. 
 
 ### <a name="create_cronjob"></a> Create a Cronjob
 
-For the most convienice your Pi should create the backups automatically. A good way to make that happen is by creating a Cronjob, which automatically executes vhpi in an interval.
-
-To run vhpi every hour you can add the following line to `/etc/crontab`. Replace `username` with the username that is supposed to run vhpi. (in most cases that would be `root`)
+I suggest creating a cronjob that runs VHPI automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run vhpi. (in most cases that would be `root`))
 ```
 @hourly         username   vhpi run
 ```
 
-You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval. E.g. if you want to create hourly snapshots the cronjob should run vhpi at least every hour, otherwise you won't get a snapshot for each hour.
+NOTICE: You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval. E.g. if you want to create hourly snapshots the cronjob should run vhpi at least every hour, otherwise you won't get a snapshot for each hour.
  You should also keep in mind that the more frequently vhpi is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run vhpi each hour or so. That way chances are higher that you get a daily backup.
 
 You can also add multiple cronjobs that execute vhpi in different intervals for different users. Thou, In most cases it would be enough to run vhpi hourly by root. 
@@ -179,4 +166,3 @@ $ /etc/init.d/cron restart
 
 If this is all done, your Pi should now run vhpi every hour and you should see some activity in the log files and of cause on your hard drive. Yay!
 
-Whenever you add new sources to a VHPI config, I suggest you to keep an eye on the log files util every thing runs stable.
