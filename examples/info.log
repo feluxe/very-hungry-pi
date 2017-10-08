@@ -1,0 +1,69 @@
+
+=====================================================================
+INFO LOG EXAMPLE
+=====================================================================
+
+
+2016-08-12 13:34:20 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-12 14:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source online  | No due jobs
+2016-08-12 14:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-12 15:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source online  | No due jobs
+2016-08-12 15:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-12 16:00:01 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source online  | No due jobs
+2016-08-12 16:00:01 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-12 17:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source online  | No due jobs
+2016-08-12 17:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-12 18:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source online  | No due jobs
+2016-08-12 18:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-12 19:00:01 [Executing] 192.168.178.20  /import/peter-laptop/peter/home/
+
+    Due: six-hourly
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found --exclude=.cache/chromium/* --exclude=.config/chromium/Default/Service Worker/CacheStorage/* --exclude=.mozilla/firefox/*/Cache --exclude=.cache/thumbnails/* --exclude=.local/share/Trash/* --exclude=.IntelliJIdea2016.2/system/caches/* /import/peter-laptop/peter/home/ /home/peter/backup/peter-laptop/peter/home/backup.latest
+
+
+    Info: sent 3,570,500,795 bytes  received 70,960 bytes  2,810,367.38 bytes/sec
+    Info: total size is 50,009,506,111  speedup is 14.01
+
+2016-08-12 19:31:57 [Completed] after: 00:31:55 (h:m:s)
+2016-08-12 19:31:57 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-12 20:00:01 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source online  | No due jobs
+2016-08-12 20:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-12 21:00:04 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-12 21:00:07 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-12 22:00:05 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-12 22:00:08 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-12 23:00:05 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-12 23:00:08 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 00:00:04 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-13 00:00:07 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 01:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source online  | No due jobs
+2016-08-13 01:00:02 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-13 02:00:02 [Executing] 192.168.178.20  /import/peter-laptop/peter/home/
+
+    Due: six-hourly
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found --exclude=.cache/chromium/* --exclude=.config/chromium/Default/Service Worker/CacheStorage/* --exclude=.mozilla/firefox/*/Cache --exclude=.cache/thumbnails/* --exclude=.local/share/Trash/* --exclude=.IntelliJIdea2016.2/system/caches/* /import/peter-laptop/peter/home/ /home/peter/backup/peter-laptop/peter/home/backup.latest
+
+
+    Info: sent 3,571,707,956 bytes  received 69,990 bytes  2,820,195.77 bytes/sec
+    Info: total size is 50,017,497,546  speedup is 14.00
+
+2016-08-13 02:31:57 [Completed] after: 00:31:54 (h:m:s)
+2016-08-13 02:31:57 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source online  | No due jobs
+2016-08-13 03:00:12 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-13 03:00:15 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 04:00:04 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-13 04:00:07 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 05:00:04 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-13 05:00:07 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 06:00:05 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-13 06:00:08 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 07:00:04 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-13 07:00:07 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 08:00:04 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | No due jobs
+2016-08-13 08:00:07 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 09:00:05 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | Due: six-hourly
+2016-08-13 09:00:08 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 10:00:04 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | Due: six-hourly
+2016-08-13 10:00:07 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
+2016-08-13 11:00:04 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/home/··················]  Source offline | Due: six-hourly
+2016-08-13 11:00:07 [Skipped] 192.168.178.20   [/import/peter-laptop/peter/vm/windows_7/··········]  Source offline | No due jobs
