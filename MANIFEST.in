@@ -1,0 +1,5 @@
+
+
+
+recursive-exclude tests *
+include vhpi/cli/interface.txt

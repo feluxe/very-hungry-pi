@@ -1,0 +1,36 @@
+# Basic App config:
+app_cfg:
+  exclude_lib:
+    standard: [
+      lost+found,
+    ]
+  intervals: {
+    hourly: 3600,
+    quarter_daily: 21600,
+    daily: 86400,
+    weekly: 604800,
+    monthly: 2592000,
+    yearly: 31536000
+  }
+
+# Backup Jobs Config:
+jobs:
+  - name: name1
+    source_ip: localhost
+    rsync_src: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    rsync_dst: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    rsync_options: -aAHSvX --delete
+    exclude_lists: [
+      standard
+    ]
+    excludes: [
+      downloads
+    ]
+    snapshots:
+      hourly: 2
+      quarter_daily: 0
+      daily: 2
+      weekly: 2
+      monthly: 2
+      yearly: 2
+

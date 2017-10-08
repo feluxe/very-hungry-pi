@@ -1,0 +1,73 @@
+2017-10-08 21:44:38 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:45:03 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly, yearly
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log Summary]:
+
+2017-10-08 21:48:03 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:50:33 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:51:03 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:51:12 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly, yearly
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log Summary]:
+sent 149 bytes  received 12 bytes  322.00 bytes/sec
+total size is 214,503  speedup is 1,332.32
+
+2017-10-08 21:52:08 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:52:16 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log Summary]:
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+
+2017-10-08 21:53:59 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:54:18 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly, yearly
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log Summary]:
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+
+2017-10-08 21:56:47 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:56:56 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly, yearly
+    [rsync]
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log Summary]:
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+
+2017-10-08 21:57:20 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly
+
+    [rsync]
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log Summary]:
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+
+2017-10-08 22:05:53 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 22:08:20 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+Invalid config file. Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a valid config file path via --config option.
+Invalid config file.
+Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a valid config file path via --config option.
+Invalid config file.
+Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a path to a config filevia --config option.
+Invalid config file.
+Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a custom path via --config option.
+Invalid config file.
+Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a custom path via --config option.

@@ -1,0 +1,319 @@
+2017-10-08 21:44:38 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:45:03 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly, yearly
+    2017-10-08 21:45:03 Start: rsync execution.
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log]:
+    sending incremental file list
+    
+
+    [Rsync Log Summary]:
+
+    2017-10-08 21:45:05 End: rsync execution.
+
+
+    2017-10-08 21:45:05 Start snapshot sequence: "hourly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:45:05 Create hardlinks: backup.latest -> hourly.0.tmp
+    2017-10-08 21:45:05 Shift snapshot "hourly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:45:05 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/hourly.2
+    2017-10-08 21:45:05 Remove deprecated snapshot: hourly.2
+    2017-10-08 21:45:05 Update timestamp for "hourly".
+
+    2017-10-08 21:45:05 Start snapshot sequence: "daily" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:45:05 Create hardlinks: backup.latest -> daily.0.tmp
+    2017-10-08 21:45:05 Shift snapshot "daily" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:45:05 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/daily.2
+    2017-10-08 21:45:05 Remove deprecated snapshot: daily.2
+    2017-10-08 21:45:05 Update timestamp for "daily".
+
+    2017-10-08 21:45:05 Start snapshot sequence: "weekly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:45:05 Create hardlinks: backup.latest -> weekly.0.tmp
+    2017-10-08 21:45:05 Shift snapshot "weekly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:45:05 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/weekly.2
+    2017-10-08 21:45:05 Remove deprecated snapshot: weekly.2
+    2017-10-08 21:45:05 Update timestamp for "weekly".
+
+    2017-10-08 21:45:05 Start snapshot sequence: "monthly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:45:05 Create hardlinks: backup.latest -> monthly.0.tmp
+    2017-10-08 21:45:05 Shift snapshot "monthly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:45:05 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/monthly.2
+    2017-10-08 21:45:05 Remove deprecated snapshot: monthly.2
+    2017-10-08 21:45:05 Update timestamp for "monthly".
+
+    2017-10-08 21:45:05 Start snapshot sequence: "yearly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:45:05 Create hardlinks: backup.latest -> yearly.0.tmp
+    2017-10-08 21:45:05 Shift snapshot "yearly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:45:05 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/yearly.2
+    2017-10-08 21:45:05 Remove deprecated snapshot: yearly.2
+    2017-10-08 21:45:05 Update timestamp for "yearly".
+2017-10-08 21:48:03 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:50:33 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:51:03 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:51:12 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly, yearly
+    2017-10-08 21:51:12 Start: rsync execution.
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log]:
+    sending incremental file list
+    
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+    
+
+    [Rsync Log Summary]:
+sent 149 bytes  received 12 bytes  322.00 bytes/sec
+total size is 214,503  speedup is 1,332.32
+
+    2017-10-08 21:51:14 End: rsync execution.
+
+
+    2017-10-08 21:51:14 Start snapshot sequence: "hourly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:51:14 Create hardlinks: backup.latest -> hourly.0.tmp
+    2017-10-08 21:51:14 Shift snapshot "hourly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:51:14 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/hourly.2
+    2017-10-08 21:51:14 Remove deprecated snapshot: hourly.2
+    2017-10-08 21:51:14 Update timestamp for "hourly".
+
+    2017-10-08 21:51:14 Start snapshot sequence: "daily" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:51:14 Create hardlinks: backup.latest -> daily.0.tmp
+    2017-10-08 21:51:14 Shift snapshot "daily" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:51:14 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/daily.2
+    2017-10-08 21:51:14 Remove deprecated snapshot: daily.2
+    2017-10-08 21:51:14 Update timestamp for "daily".
+
+    2017-10-08 21:51:14 Start snapshot sequence: "weekly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:51:14 Create hardlinks: backup.latest -> weekly.0.tmp
+    2017-10-08 21:51:14 Shift snapshot "weekly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:51:14 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/weekly.2
+    2017-10-08 21:51:14 Remove deprecated snapshot: weekly.2
+    2017-10-08 21:51:14 Update timestamp for "weekly".
+
+    2017-10-08 21:51:14 Start snapshot sequence: "monthly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:51:14 Create hardlinks: backup.latest -> monthly.0.tmp
+    2017-10-08 21:51:14 Shift snapshot "monthly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:51:14 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/monthly.2
+    2017-10-08 21:51:14 Remove deprecated snapshot: monthly.2
+    2017-10-08 21:51:14 Update timestamp for "monthly".
+
+    2017-10-08 21:51:14 Start snapshot sequence: "yearly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:51:14 Create hardlinks: backup.latest -> yearly.0.tmp
+    2017-10-08 21:51:14 Shift snapshot "yearly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:51:14 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/yearly.2
+    2017-10-08 21:51:14 Remove deprecated snapshot: yearly.2
+    2017-10-08 21:51:14 Update timestamp for "yearly".
+2017-10-08 21:52:08 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:52:16 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly
+    2017-10-08 21:52:16 Start: rsync execution.
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log]:
+    sending incremental file list
+    
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+    
+
+    [Rsync Log Summary]:
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+
+    2017-10-08 21:52:18 End: rsync execution.
+
+
+    2017-10-08 21:52:18 Start snapshot sequence: "hourly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:52:18 Create hardlinks: backup.latest -> hourly.0.tmp
+    2017-10-08 21:52:18 Shift snapshot "hourly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:52:18 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/hourly.2
+    2017-10-08 21:52:18 Remove deprecated snapshot: hourly.2
+    2017-10-08 21:52:18 Update timestamp for "hourly".
+
+    2017-10-08 21:52:18 Start snapshot sequence: "daily" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:52:18 Create hardlinks: backup.latest -> daily.0.tmp
+    2017-10-08 21:52:18 Shift snapshot "daily" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:52:18 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/daily.2
+    2017-10-08 21:52:18 Remove deprecated snapshot: daily.2
+    2017-10-08 21:52:18 Update timestamp for "daily".
+
+    2017-10-08 21:52:18 Start snapshot sequence: "weekly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:52:18 Create hardlinks: backup.latest -> weekly.0.tmp
+    2017-10-08 21:52:18 Shift snapshot "weekly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:52:18 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/weekly.2
+    2017-10-08 21:52:18 Remove deprecated snapshot: weekly.2
+    2017-10-08 21:52:18 Update timestamp for "weekly".
+
+    2017-10-08 21:52:18 Start snapshot sequence: "monthly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:52:18 Create hardlinks: backup.latest -> monthly.0.tmp
+    2017-10-08 21:52:18 Shift snapshot "monthly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:52:18 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/monthly.2
+    2017-10-08 21:52:18 Remove deprecated snapshot: monthly.2
+    2017-10-08 21:52:18 Update timestamp for "monthly".
+2017-10-08 21:53:59 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:54:18 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly, yearly
+    2017-10-08 21:54:18 Start: rsync execution.
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log]:
+    sending incremental file list
+    
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+    
+
+    [Rsync Log Summary]:
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+
+    2017-10-08 21:54:20 End: rsync execution.
+
+
+    2017-10-08 21:54:20 Start snapshot sequence: "hourly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:54:20 Create hardlinks: backup.latest -> hourly.0.tmp
+    2017-10-08 21:54:20 Shift snapshot "hourly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:54:20 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/hourly.2
+    2017-10-08 21:54:20 Remove deprecated snapshot: hourly.2
+    2017-10-08 21:54:20 Update timestamp for "hourly".
+
+    2017-10-08 21:54:20 Start snapshot sequence: "daily" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:54:20 Create hardlinks: backup.latest -> daily.0.tmp
+    2017-10-08 21:54:20 Shift snapshot "daily" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:54:20 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/daily.2
+    2017-10-08 21:54:20 Remove deprecated snapshot: daily.2
+    2017-10-08 21:54:20 Update timestamp for "daily".
+
+    2017-10-08 21:54:20 Start snapshot sequence: "weekly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:54:20 Create hardlinks: backup.latest -> weekly.0.tmp
+    2017-10-08 21:54:20 Shift snapshot "weekly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:54:20 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/weekly.2
+    2017-10-08 21:54:20 Remove deprecated snapshot: weekly.2
+    2017-10-08 21:54:20 Update timestamp for "weekly".
+
+    2017-10-08 21:54:20 Start snapshot sequence: "monthly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:54:20 Create hardlinks: backup.latest -> monthly.0.tmp
+    2017-10-08 21:54:20 Shift snapshot "monthly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:54:20 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/monthly.2
+    2017-10-08 21:54:20 Remove deprecated snapshot: monthly.2
+    2017-10-08 21:54:20 Update timestamp for "monthly".
+
+    2017-10-08 21:54:20 Start snapshot sequence: "yearly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:54:20 Create hardlinks: backup.latest -> yearly.0.tmp
+    2017-10-08 21:54:20 Shift snapshot "yearly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:54:20 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/yearly.2
+    2017-10-08 21:54:20 Remove deprecated snapshot: yearly.2
+    2017-10-08 21:54:20 Update timestamp for "yearly".
+2017-10-08 21:56:47 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 21:56:56 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly, monthly, yearly
+    [rsync]
+    2017-10-08 21:56:56 Start: rsync execution.
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log]:
+    sending incremental file list
+    
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+    
+
+    [Rsync Log Summary]:
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+
+    2017-10-08 21:56:58 End: rsync execution.
+
+
+    2017-10-08 21:56:58 Start snapshot sequence: "hourly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:56:58 Create hardlinks: backup.latest -> hourly.0.tmp
+    2017-10-08 21:56:58 Shift snapshot "hourly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:56:58 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/hourly.2
+    2017-10-08 21:56:58 Remove deprecated snapshot: hourly.2
+    2017-10-08 21:56:58 Update timestamp for "hourly".
+
+    2017-10-08 21:56:58 Start snapshot sequence: "daily" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:56:58 Create hardlinks: backup.latest -> daily.0.tmp
+    2017-10-08 21:56:58 Shift snapshot "daily" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:56:58 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/daily.2
+    2017-10-08 21:56:58 Remove deprecated snapshot: daily.2
+    2017-10-08 21:56:58 Update timestamp for "daily".
+
+    2017-10-08 21:56:58 Start snapshot sequence: "weekly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:56:58 Create hardlinks: backup.latest -> weekly.0.tmp
+    2017-10-08 21:56:58 Shift snapshot "weekly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:56:58 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/weekly.2
+    2017-10-08 21:56:58 Remove deprecated snapshot: weekly.2
+    2017-10-08 21:56:58 Update timestamp for "weekly".
+
+    2017-10-08 21:56:58 Start snapshot sequence: "monthly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:56:58 Create hardlinks: backup.latest -> monthly.0.tmp
+    2017-10-08 21:56:58 Shift snapshot "monthly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:56:58 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/monthly.2
+    2017-10-08 21:56:58 Remove deprecated snapshot: monthly.2
+    2017-10-08 21:56:58 Update timestamp for "monthly".
+
+    2017-10-08 21:56:58 Start snapshot sequence: "yearly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:56:58 Create hardlinks: backup.latest -> yearly.0.tmp
+    2017-10-08 21:56:58 Shift snapshot "yearly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:56:58 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/yearly.2
+    2017-10-08 21:56:58 Remove deprecated snapshot: yearly.2
+    2017-10-08 21:56:58 Update timestamp for "yearly".
+2017-10-08 21:57:20 [Executing] localhost	/home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+
+    Due: hourly, daily, weekly
+
+    [rsync]
+    2017-10-08 21:57:20 Start: rsync execution.
+    Executing: rsync -aAHSvX --delete --exclude=downloads --exclude=lost+found /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/ /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/backup.latest
+
+    [Rsync Log]:
+    sending incremental file list
+    
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+    
+
+    [Rsync Log Summary]:
+    sent 149 bytes  received 12 bytes  322.00 bytes/sec
+    total size is 214,503  speedup is 1,332.32
+
+    2017-10-08 21:57:22 End: rsync execution.
+
+
+    2017-10-08 21:57:22 Start snapshot sequence: "hourly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:57:22 Create hardlinks: backup.latest -> hourly.0.tmp
+    2017-10-08 21:57:22 Shift snapshot "hourly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:57:22 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/hourly.2
+    2017-10-08 21:57:22 Remove deprecated snapshot: hourly.2
+    2017-10-08 21:57:22 Update timestamp for "hourly".
+
+    2017-10-08 21:57:22 Start snapshot sequence: "daily" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:57:22 Create hardlinks: backup.latest -> daily.0.tmp
+    2017-10-08 21:57:22 Shift snapshot "daily" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:57:22 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/daily.2
+    2017-10-08 21:57:22 Remove deprecated snapshot: daily.2
+    2017-10-08 21:57:22 Update timestamp for "daily".
+
+    2017-10-08 21:57:22 Start snapshot sequence: "weekly" for: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/src/
+    2017-10-08 21:57:22 Create hardlinks: backup.latest -> weekly.0.tmp
+    2017-10-08 21:57:22 Shift snapshot "weekly" in /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root
+    2017-10-08 21:57:22 Deleting deprecated snapshot: /home/felix/dev_projects/very_hungry_pi/vhpi1.1/tests/mock/backup_root/weekly.2
+    2017-10-08 21:57:22 Remove deprecated snapshot: weekly.2
+    2017-10-08 21:57:22 Update timestamp for "weekly".
+2017-10-08 22:05:53 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+2017-10-08 22:08:20 [Skipped] [localhost      ] [/home/felix/dev_project[...]hpi1.1/tests/mock/src/] [Source online ] [No due jobs]
+Invalid config file. Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a valid config file path via --config option.
+Invalid config file.
+Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a valid config file path via --config option.
+Invalid config file.
+Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a path to a config filevia --config option.
+Invalid config file.
+Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a custom path via --config option.
+Invalid config file.
+Please provide a valid config file at the default location: "~/.config/vhpi/vhpi_cfg.yaml" or provide a custom path via --config option.

@@ -1,0 +1,38 @@
+
+
+proj_name_literal: 'Very Hungry Pi'
+proj_name_computable: 'vhpi'
+
+proj_pypi_name: 'vhpi'
+proj_package_name: 'vhpi'
+
+github_repo_name: 'very_hungry_pi'
+version: '2.0.0-alpha.0'
+license: 'AGPLv3'
+author: 'Felix Meyer-Wolters'
+author_email: 'felix@meyerwolters.de'
+maintainer: 'Felix Meyer-Wolters'
+maintainer_email: 'felix@meyerwolters.de'
+url: 'https://github.com/feluxe/very_hungry_pi'
+description: 'Turn your Raspberry Pi into an independent backup module for your network. '
+keywords: ["raspberry-pi"," backup"," snapshot",]
+
+
+interpreter: "python3.6"
+gemfury_env: "python"
+pypi:
+  install_requires: ["docopt",]
+  packages: ["vhpi"]
+  package_dir: {"vhpi": "vhpi"}
+  package_data: {"" : ["cli/interface.txt"]}
+  py_modules: []
+  data_files: []
+  classifiers: []
+  platforms: ""
+  entry_points: {
+    "console_scripts": ["vhpi = vhpi.main:execute"],
+    "gui_scripts": []
+    }
+  tests_require: ["wheel"," buildlib"," pytest",]
+
+

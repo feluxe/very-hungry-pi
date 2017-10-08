@@ -1,0 +1,34 @@
+
+
+
+
+### Misc. ###
+INFO.fmw.md
+.cache/
+
+### Python ###
+__pycache__/
+.env
+*.pyc
+venv-vhpi/
+
+### Wheels ###
+build/
+dist/
+vhpi.egg-info/
+
+### Intellij ###
+*.iml
+.idea/
+
+### Vim ###
+.swp
+
+### testing ###
+tests/mock/backup_root/
+**/tmp/*
+
+
+
+
+

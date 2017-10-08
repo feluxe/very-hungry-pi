@@ -1,0 +1,14 @@
+ ╔══════════╗
+ ║   vhpi   ║
+ ╚══════════╝
+
+Usage:
+    vhpi run  [options]
+    vhpi -h | --help
+    vhpi --version
+
+Options:
+    -c, --config <dir>                Define a custom config directory.
+                                      Default: ~/.config/.vhpi/vhpi_cfg.yaml
+    -h, --help                        Show this screen.
+        --version                     Show version.
