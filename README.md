@@ -33,7 +33,7 @@ More details about the script in the wiki: ['What the script does in detail'](ht
     * because *vhpi* creates new snapshots as 'hard links' for all files that haven't changed. (No duplicate files.. just links)
 * The process is nicely logged ('info.log', 'debug.log').
 * If a backup process takes long, *vhpi* blocks any attempt to start a new backup process until the first one has finished to prevent the Pi from overloading.
-* More features are planned (See: [Version Overvire](https://github.com/feluxe/very_hungry_pi/wiki/Version-Overview-(TODOs)))
+* More features are planned (See: [Version Overview](https://github.com/feluxe/very_hungry_pi/wiki/Version-Overview-(TODOs)))
 
 ## <a name="requirements"></a> Requirements:
 
@@ -42,7 +42,7 @@ More details about the script in the wiki: ['What the script does in detail'](ht
 
 ## <a name="example_config"></a> Example Config
 
-#### vhpi_cfg.yaml
+#### `~/.config/vhpi/vhpi_cfg.yaml`
 
  ```yaml  
 # Basic App Settings:
@@ -108,15 +108,15 @@ jobs:
 
 ### Sharing backup sources with the Pi:
 
-Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba` (There are plenty tutorials on this in the www).
-Perhaps *vhpi* can also create backups of your Pi's local directories as well.
+Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba` (There are plenty tutorials for this on the www).
+Perhaps *vhpi* can also create local backups as well.
 
-You should use `autofs` or similar to automatically mount the shared directories with your Pi whenever they are available. This way your Pi will automatically mount the directories when a machine enters the network.
+You should use `autofs` or similar to automatically mount the shared directories with your Pi whenever they are available. This way your Pi will automatically mount the directories whenever a machine enters the network.
 
 
 ### Download and Install:
 
-Simples way to install *vhpi* is by useing pip. You need Python3.6 for *vhpi* to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
+Simplest way to install *vhpi* is by useing pip. You need Python3.6 for *vhpi* to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
 After you installed Python3.6 you can run pip to install *vhpi* like this:
 ```
 $ pip3.6 install vhpi
@@ -132,29 +132,29 @@ It should print the help text to the terminal.
 
 ### Configure vhpi:
 
-Pip creates a config dir at `~/.config/vhpi/`, there you should fine a file `vhpi_cfg.yaml. This is where you configure your backup jobs.
+Pip creates a config dir at `~/.config/vhpi/`, there you should fine a file `vhpi_cfg.yaml`. This is where you configure your backup jobs. The config file is pretty self explanatory, just have a look at the [Example Config](#example_config)
 
 
 ### Test the configuration 
 
-In order to test *vhpi* I suggest setting up some some dummy backup sources to some save destinations. Maybe in the `/tmp` dir or so. Then just run this command a couple of times and see if the destionation is filled with backups/snapshots, the way you wish:
+In order to test *vhpi* I suggest setting up some dummy backup sources that point to some save destinations. Maybe in the `/tmp` dir or so. Then just run the following command a couple of times and see if the destination gets filled with backups/snapshots, the way you wish:
 
  ```
  $ vhpi run
  ```
  
 If you get an error try to adjust the config. If you think there is a bug feel free to use the [github issue tracker](https://github.com/feluxe/very_hungry_pi/issues).
-The results of each run are added to the log-files as well (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
- If your configuration works the way you wish, you should create a cronjob to make your Pi run *vhpi* automatically. 
+The results of each run is added to the log-files as well (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
 
 ### <a name="create_cronjob"></a> Create a Cronjob
 
 I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run *vhpi*. (in most cases that would be `root`))
+
 ```
 @hourly         username   vhpi run
 ```
 
-NOTICE: You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval. E.g. if you want to create hourly snapshots the cronjob should run *vhpi* at least every hour, otherwise you won't get a snapshot for each hour.
+NOTICE: You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval that you use. E.g. if you want to create hourly snapshots the cronjob should run *vhpi* at least every hour, otherwise you won't get a snapshot for each hour.
  You should also keep in mind that the more frequently *vhpi* is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run *vhpi* each hour or so. That way chances are higher that you get a daily backup.
 
 You can also add multiple cronjobs that execute *vhpi* in different intervals for different users. Thou, In most cases it would be enough to run *vhpi* hourly by root. 
@@ -165,5 +165,5 @@ After you added the cronjob, you should restart your Pi or restart the crontab l
 $ /etc/init.d/cron restart
 ```
 
-If this is all done, your Pi should now run *vhpi* every hour and you should see some activity in the log files and of cause on your hard drive. Yay!
+If this is all done, your Pi should run *vhpi* every hour and you should see some activity in the log files and of cause on your hard drive. Yay!
 
