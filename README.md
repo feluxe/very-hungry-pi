@@ -18,7 +18,7 @@ To get the most control over the backups *vhpi* takes raw [rsync options](http:/
 
 More details about the script in the wiki: ['What the script does in detail'](https://github.com/feluxe/very_hungry_pi/wiki/What-the-script-does-in-detail).
 
-**TL;DR:** Just setup vhpi, run your Pi 24/7 and don't care about backups no more.
+**TL;DR:** Just setup *vhpi*, run your Pi 24/7 and don't care about backups no more.
 <br>
 
 ## <a name="features"></a> Features
@@ -35,18 +35,20 @@ More details about the script in the wiki: ['What the script does in detail'](ht
 * If a backup process takes long, *vhpi* blocks any attempt to start a new backup process until the first one has finished to prevent the Pi from overloading.
 * More features are planned (See: [Version Overvire](https://github.com/feluxe/very_hungry_pi/wiki/Version-Overview-(TODOs)))
 
-##<a name="requirements"></a> Requirements:
+## <a name="requirements"></a> Requirements:
 
 * You need Python >= 3.6 on your Pi for *vhpi* to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
 * The file system of your Backup destination has to support hard links. (most common fs like NTFS and ext do...)
 
-## <a name="example_config"></a> Example Config 
+## <a name="example_config"></a> Example Config
+
+#### vhpi_cfg.yaml
 
  ```yaml  
 # Basic App Settings:
 app_cfg:
-  # Here you can create different list of files/dirs that you want to exclude 
-  # from the backup.
+  # Create different list of files/dirs that you want to exclude from your
+  # backups.
   exclude_lib:
     standard_list: [
       lost+found/*,
@@ -58,8 +60,7 @@ app_cfg:
     another_list: [
       some_dir
     ]
-  # Here you can define time intervals, which you may use for your snapshots.
-  # Define any interval you want e.g. 'hourly: 3600'
+  # Define time intervals, which you may use for your snapshots.
   # Feel free to use your own definitions like 'every_four_hours: 14400' etc.
   # Values must be in Seconds.
   intervals: {
@@ -72,15 +73,15 @@ app_cfg:
   }
 
 # Backup Jobs Config.
-# Herer you can configure each backup source:
+# Configure each backup source here:
 jobs:
   # Source 1:
   - name: 'Dummy Source'
     source_ip: '192.168.178.20'             # The ip of the computer to which the mounted src dir belongs to. If it's a local source use: "127.0.0.1" or "localhost".
-    rsync_src: 'tests/dummy_src/src1/'      # The path to the mounted or local dir.
-    rsync_dst: 'tests/dummy_dest/dest1/'    # The path to the destination dir in which each snapshot is created.
+    rsync_src: '/tmp/tests/dummy_src/src1/'      # The path to the mounted or local dir.
+    rsync_dst: '/tmp/tests/dummy_dest/dest1/'    # The path to the destination dir in which each snapshot is created.
     rsync_options: '-aAHSvX --delete'       # The options that you want to use for your rsync backup. Default is "-av". More info on rsync: http://linux.die.net/man/1/rsync
-    exclude_lists: [                        # Add exclude lists to exclude a list of file/folders. See above: app_cfg -> exclude_lib 
+    exclude_lists: [                        # Add exclude lists to exclude a list of file/folders. See above: app_cfg -> exclude_lib
       standard_list,
       another_list
     ]
@@ -95,7 +96,7 @@ jobs:
       weekly: 4
       monthly: 6
       yearly: 6
-      
+
   # Source 2:
   - name: 'Another Dummy Source'
     source_ip: 192.168.178.36
@@ -105,23 +106,23 @@ jobs:
 ## <a name="install"></a> Installation & Configuration
 
 
-### Share backup sources with the Pi:
+### Sharing backup sources with the Pi:
 
 Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba` (There are plenty tutorials on this in the www).
-Perhaps vhpi can also create backups of your Pi's local directories as well.
+Perhaps *vhpi* can also create backups of your Pi's local directories as well.
 
 You should use `autofs` or similar to automatically mount the shared directories with your Pi whenever they are available. This way your Pi will automatically mount the directories when a machine enters the network.
 
 
 ### Download and Install:
 
-Simples way to install VHPI is by useing pip. You need Python3.6 for VHPI to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
-After you installed Python3.6 you can run pip to install VHPI like this:
+Simples way to install *vhpi* is by useing pip. You need Python3.6 for *vhpi* to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
+After you installed Python3.6 you can run pip to install *vhpi* like this:
 ```
 $ pip3.6 install vhpi
 ```
 
-Run this command to check if VHPI was isntalled successfully:
+Run this command to check if *vhpi* was isntalled successfully:
 
 ```
 $ vhpi --help
@@ -136,7 +137,7 @@ Pip creates a config dir at `~/.config/vhpi/`, there you should fine a file `vhp
 
 ### Test the configuration 
 
-In order to test VHPI I suggest setting up some some dummy backup sources to some save destinations. Maybe in the `/tmp` dir or so. Then just run this command a couple of times and see if the destionation is filled with backups/snapshots, the way you wish:
+In order to test *vhpi* I suggest setting up some some dummy backup sources to some save destinations. Maybe in the `/tmp` dir or so. Then just run this command a couple of times and see if the destionation is filled with backups/snapshots, the way you wish:
 
  ```
  $ vhpi run
@@ -144,19 +145,19 @@ In order to test VHPI I suggest setting up some some dummy backup sources to som
  
 If you get an error try to adjust the config. If you think there is a bug feel free to use the [github issue tracker](https://github.com/feluxe/very_hungry_pi/issues).
 The results of each run are added to the log-files as well (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
- If your configuration works the way you wish, you should create a cronjob to make your Pi run vhpi automatically. 
+ If your configuration works the way you wish, you should create a cronjob to make your Pi run *vhpi* automatically. 
 
 ### <a name="create_cronjob"></a> Create a Cronjob
 
-I suggest creating a cronjob that runs VHPI automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run vhpi. (in most cases that would be `root`))
+I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run *vhpi*. (in most cases that would be `root`))
 ```
 @hourly         username   vhpi run
 ```
 
-NOTICE: You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval. E.g. if you want to create hourly snapshots the cronjob should run vhpi at least every hour, otherwise you won't get a snapshot for each hour.
- You should also keep in mind that the more frequently vhpi is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run vhpi each hour or so. That way chances are higher that you get a daily backup.
+NOTICE: You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval. E.g. if you want to create hourly snapshots the cronjob should run *vhpi* at least every hour, otherwise you won't get a snapshot for each hour.
+ You should also keep in mind that the more frequently *vhpi* is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run *vhpi* each hour or so. That way chances are higher that you get a daily backup.
 
-You can also add multiple cronjobs that execute vhpi in different intervals for different users. Thou, In most cases it would be enough to run vhpi hourly by root. 
+You can also add multiple cronjobs that execute *vhpi* in different intervals for different users. Thou, In most cases it would be enough to run *vhpi* hourly by root. 
 
 After you added the cronjob, you should restart your Pi or restart the crontab like this:
 
@@ -164,5 +165,5 @@ After you added the cronjob, you should restart your Pi or restart the crontab l
 $ /etc/init.d/cron restart
 ```
 
-If this is all done, your Pi should now run vhpi every hour and you should see some activity in the log files and of cause on your hard drive. Yay!
+If this is all done, your Pi should now run *vhpi* every hour and you should see some activity in the log files and of cause on your hard drive. Yay!
 

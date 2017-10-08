@@ -11,3 +11,4 @@
 ### [] Write Changelog.
 ### [] Update Wiki files.
 ### [] Inject example cfg into README via build.py.
+### [] Update: wiki page: What the script does in detail.
