@@ -36,7 +36,6 @@ def set_cfg_dir(custom_dir: str):
 
     APP_CFG_DIR = custom_dir
     USER_CFG_FILE = f'{APP_CFG_DIR}/vhpi_cfg.yaml'
-    LOG_CFG_FILE = f'{APP_CFG_DIR}/log_cfg.yaml'
 
 
 def init_default_constants() -> None:

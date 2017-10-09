@@ -19,6 +19,7 @@ import sys
 import os
 import subprocess as sp
 import vhpi.api.logging as log
+from vhpi.api.logging import job_out_msg
 from vhpi.api.types import Job
 import vhpi.constants as const
 
@@ -50,7 +51,7 @@ def validate_machine_is_online(source_ip, init_time):
             f'    Error: Source went offline: '
             f'{time.strftime(const.TIMESTAMP_FORMAT)}'
         )
-        log.job_out(2, init_time)
+        log.error(job_out_msg(2, init_time))
         return False
     return True
 
@@ -61,7 +62,7 @@ def validate_backup_src(backup_src, init_time):
             f'    Error: Backup source does not exist.": '
             f'{backup_src}'
         )
-        log.job_out(2, init_time)
+        log.error(job_out_msg(2, init_time))
         return False
     return True
 
@@ -72,7 +73,7 @@ def validate_backup_dst(backup_dst, init_time):
             f'    Error: Invalid Destination: {backup_dst}: '
             f'{time.strftime(const.TIMESTAMP_FORMAT)}'
         )
-        log.job_out(2, init_time)
+        log.error(job_out_msg(2, init_time))
         return False
     return True
 

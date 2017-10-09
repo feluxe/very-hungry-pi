@@ -215,7 +215,8 @@ def make(
 
     os.rename(
         src=snap.dst_tmp,
-        dst=f'{snap.dst}_{time.strftime("%Y-%m-%d")}_{time.strftime("%H:%M:%S")}'
+        dst=f'{snap.dst}_{time.strftime("%Y-%m-%d")}_'
+            f'{time.strftime("%H:%M:%S")}'
     )
 
     _rm_deprecated_snaps(snap)

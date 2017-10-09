@@ -31,8 +31,8 @@ import vhpi.api.logging as log
 
 def check_lock(lockfile):
     """
-    Check if another instance of the script is already running by using the 'flock' mechanism.
-    If another instance is already running: exit app.
+    Check if another instance of the script is already running by using the
+    'flock' mechanism. If another instance is already running: exit app.
     """
     try:
         lockfile = open(lockfile, 'w')
@@ -143,8 +143,6 @@ def get_due_snapshots(
 
 def duty_check_routine(job: Job):
     """"""
-    result = True
-
     if not job.due_snapshots:
         log.info(
             skip_msg(True, job.due_snapshots, job.source_ip, job.backup_src))
