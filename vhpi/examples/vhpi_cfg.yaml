@@ -51,7 +51,7 @@ jobs:
       yearly: 6
 
   # Source 2:
-  - name: 'Another Dummy Source'
-    source_ip: 192.168.178.36
-   # etc...'
+  # - name: 'Another Dummy Source'
+  #   source_ip: 192.168.178.36
+  #   etc...'
 

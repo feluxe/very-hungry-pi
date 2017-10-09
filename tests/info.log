@@ -554,3 +554,23 @@ Please provide a valid config file at the default location: "~/.config/vhpi/vhpi
     sent 149 bytes  received 12 bytes  322.00 bytes/sec
     total size is 214,503  speedup is 1,332.32
 
+2017-10-09 03:15:13 [Skipped] [localhost      ] [/home/felix/dev_project[...]/vhpi2/tests/mock/src/] [Source online ] [No due jobs]
+    Error: Backup source does not exist.": /tmp/tests/dummy_src/src1/
+
+2017-10-09 03:15:40 [Failed] after: 00:00:00 (h:m:s) 
+Type Error in config file. "rsync_src" must be of type string.
+    Error: Backup source does not exist.": /tmp/tests/dummy_src/src1/
+
+2017-10-09 03:16:18 [Failed] after: 00:00:00 (h:m:s) 
+Type Error in config file. "rsync_src" must be of type string.
+    Error: Backup source does not exist.": /tmp/tests/dummy_src/src1/
+
+2017-10-09 03:16:35 [Failed] after: 00:00:00 (h:m:s) 
+Type Error in config file. "rsync_src" must be of type string.
+    Error: Backup source does not exist.": /tmp/tests/dummy_src/src1/
+
+2017-10-09 03:17:14 [Failed] after: 00:00:00 (h:m:s) 
+Type Error in config file. "rsync_src" must be of type string.
+    Error: Backup source does not exist.": /tmp/tests/dummy_src/src1/
+
+2017-10-09 03:17:52 [Failed] after: 00:00:00 (h:m:s) 

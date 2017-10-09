@@ -27,6 +27,8 @@ vhpi.egg-info/
 ### testing ###
 tests/mock/backup_root/
 **/tmp/*
+tests/debug.log
+tests/info.log
 
 
 
