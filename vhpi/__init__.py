@@ -24,22 +24,24 @@ def _ensure_dir(cfg_dir: str):
     os.makedirs(cfg_dir, exist_ok=True)
 
 
-def _create_config():
+def _create_config(default_cfg_file):
     """Create a file if it does not exist."""
     example_cfg: str = os.path.abspath(
         resource_filename('vhpi.examples', 'vhpi_cfg.yaml'))
 
     with open(example_cfg, 'r') as src_file:
-        with open(const.USER_CFG_FILE, 'w') as dst_file:
+        with open(default_cfg_file, 'w') as dst_file:
             dst_file.write(src_file.read())
 
 
 # Init app constants.
 const.init_default_constants()
 
-# Make sure default config files exist.
 _ensure_dir(const.APP_CFG_DIR)
-_create_config()
+
+# Make sure default config files exist.
+if not os.path.isfile(const.USER_CFG_FILE):
+    _create_config(const.USER_CFG_FILE)
 
 __author__ = "Felix Meyer-Wolters"
 __license__ = "GPL-3.0"
