@@ -70,8 +70,7 @@ def validate_backup_src(backup_src, init_time):
 def validate_backup_dst(backup_dst, init_time):
     if not os.path.isdir(backup_dst):
         log.critical(
-            f'    Error: Invalid Destination: {backup_dst}: '
-            f'{time.strftime(const.TIMESTAMP_FORMAT)}'
+            f'    Error: Invalid Destination: {backup_dst}'
         )
         log.error(job_out_msg(2, init_time))
         return False

@@ -102,7 +102,7 @@ def exec_rsync(rsync_command: list, job: Job):
     return_val = True
 
     try:
-        log.info('    Executing: ' + ' '.join(rsync_command))
+        log.debug('    Executing: ' + ' '.join(rsync_command))
 
         p = sp.Popen(
             rsync_command,
