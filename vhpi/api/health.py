@@ -100,33 +100,32 @@ def initial_job_validation_routine(
     These checks are run directly on the cfg data, before the Job object is
     created.
     """
-    result = True
     backup_src = job_cfg.get('rsync_src')
     backup_dst = job_cfg.get('rsync_dst')
 
     if not type(backup_src) == str:
         log_cfg_type_err('rsync_src', 'string')
-        result = False
+        return False
 
     if not type(backup_dst) == str:
         log_cfg_type_err('rsync_dst', 'string')
-        result = False
+        return False
 
     if not backup_src[0] in ['/']:
         log_cfg_no_absolute_path_err('rsync_src')
-        result = False
+        return False
 
     if not backup_dst[0] in ['/']:
         log_cfg_no_absolute_path_err('rsync_dst')
-        result = False
+        return False
 
     if not validate_backup_src(backup_src, init_time):
-        result = False
+        return False
 
     if not validate_backup_dst(backup_dst, init_time):
-        result = False
+        return False
 
-    return result
+    return True
 
 
 def rsync_monitor_routine(job: Job):
