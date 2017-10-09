@@ -15,9 +15,11 @@
 # along with 'Very Hungry Pi'.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import glob
+from glob import glob
 import subprocess as sub
 import time
+import re
+from itertools import chain
 from typing import Union, List, NamedTuple
 from vhpi.api.logging import ts_msg
 import vhpi.api.logging as log
@@ -66,17 +68,25 @@ def _create_hardlinks(snap: Snap) -> None:
 
 def _shift(snap: Snap) -> None:
     """
-    Increase the dir num by one for selected snapshot interval type.
+    Increase the num in the dir by one for selected snapshot interval type.
     """
     log.debug(
         ts_msg(4, f'Shift snapshot "{snap.interval}" in {snap.backup_root}'))
 
-    base_name = clean_path(f'{snap.backup_root}/{snap.interval}.')
+    len_base = len(snap.dst_base)
 
-    for i in reversed(range(0, len(glob.glob(base_name + '*[0-9]')))):
+    for path in glob(snap.dst_base + '[0-9]_[0-9]*'):
+        num = re.match('[0-9]+', path[len_base:]).group()
+        num = int(num)
+
+        pattern = f'{snap.dst_base}{num}'
+        replacement = f'{snap.dst_base}{num+1}'
+
+        new_path = re.sub(pattern, replacement, path)
+
         os.rename(
-            src=base_name + str(i),
-            dst=base_name + str(i + 1)
+            src=path,
+            dst=new_path
         )
 
 
@@ -86,19 +96,20 @@ def _get_deprecated_snaps(snap: Snap) -> Union[List[SnapDir], list]:
     Dirs that contain snapshots that are older than what the user wants to keep.
     The keep range is defined in the config yaml file.
     """
-    base_dir: str = clean_path(f'{snap.backup_root}/{snap.interval}.')
     keep_range: list = range(0, snap.keep_amount)
 
     snaps_to_keep: Union[List[SnapDir], list] = [
-        base_dir + str(num)
+        glob(f'{snap.dst_base}{str(num)}_[0-9]*')
         for num
         in keep_range
     ]
 
+    snaps_to_keep = list(chain.from_iterable(snaps_to_keep))
+
     deprecated: Union[List[SnapDir], list] = [
         _dir
         for _dir
-        in glob.glob(base_dir + '*')
+        in glob(snap.dst_base + '*')
         if _dir not in snaps_to_keep
     ]
 
@@ -159,9 +170,9 @@ def _init_snapshot(
     job: Job,
 ) -> Snap:
     """"""
-    dst_base = clean_path(f'{job.backup_root}/{interval}.')
+    dst_base = clean_path(f'{job.backup_root}/{interval}_')
     dst = f'{dst_base}0'
-    dst_tmp = f'{dst}.tmp'
+    dst_tmp = f'{dst}_tmp'
 
     snap = Snap(
         backup_root=job.backup_root,
@@ -200,12 +211,11 @@ def make(
 
     _create_hardlinks(snap)
 
-    if os.path.exists(snap.dst):
-        _shift(snap)
+    _shift(snap)
 
     os.rename(
         src=snap.dst_tmp,
-        dst=snap.dst
+        dst=f'{snap.dst}_{time.strftime("%Y-%m-%d")}_{time.strftime("%H:%M:%S")}'
     )
 
     _rm_deprecated_snaps(snap)
