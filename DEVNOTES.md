@@ -6,6 +6,7 @@
 
 
 ### [x] Add timestamp to snapshot dir names.
+### [] Create cfg file with content from example config on first execution.
 ### [] Add option in cfg to use exclude files.
 ### [] Write List of Breaking Changes
 ### [] Adjust README to v2.
