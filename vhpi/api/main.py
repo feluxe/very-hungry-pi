@@ -39,8 +39,8 @@ def check_lock(lockfile):
         fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
 
     except BlockingIOError:
-        log.debug(ts_msg(4, 'Info: Another instance of this vhpi was executed, '
-                            'but it was blocked successfully.'))
+        log.debug(ts_msg(4, 'Info: Another instance of vhpi was executed and '
+                            'blocked successfully.'))
         sys.exit(0)
     return lockfile
 
