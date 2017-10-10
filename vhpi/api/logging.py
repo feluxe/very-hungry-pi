@@ -39,27 +39,30 @@ def job_start_msg(
 
 
 def job_out_msg(
-    code: int,
     timestamp: int,
-    message: str = ''
+    message: str = '',
+    completed: bool = False,
+    skipped: bool = False,
+    failed: bool = False,
+    unknown: bool = False,
 ) -> str:
     """
-    Log message used when a job ends.
+    This message is used to log execution results of a job.
     """
     seconds = time.time() - timestamp
     duration = time.strftime('%H:%M:%S', time.gmtime(seconds))
     new_msg = ''
 
-    if code == 0:
+    if completed:
         new_msg += f'[Completed] after: {duration} (h:m:s) {message}'
 
-    elif code == 1:
+    elif skipped:
         new_msg += f'[Skipped] {message}'
 
-    elif code == 2:
+    elif failed:
         new_msg += f'[Failed] after: {duration} (h:m:s) {message}'
 
-    else:
+    elif unknown:
         new_msg += f'[Job Result Unknown] after: {duration} (h:m:s) {message}'
 
     return f'\n{time.strftime(const.TIMESTAMP_FORMAT)} {new_msg}'
@@ -72,7 +75,8 @@ def skip_msg(
     path: str
 ) -> str:
     """
-    Log message for Skipping a backup.
+    This message is used to log a single line, that says a job is fine, but
+    not due or the source is offline.
     """
     state: str = 'online' if online else 'offline'
     due_jobs: list = due_jobs or []

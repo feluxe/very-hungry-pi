@@ -43,9 +43,6 @@ def _create_hardlinks(snap: Snap) -> None:
     """
     Create hard-links with unix cp tool.
     """
-    if os.path.exists(snap.dst_tmp):
-        raise FileExistsError(f'Hardlink destination already exists.')
-
     log.debug(ts_msg(4, f'Create hardlinks: {snap.src.split("/")[-1]} '
                         f'-> {snap.dst_tmp.split("/")[-1]}'))
 
@@ -197,11 +194,8 @@ def make(
     Create a new snapshot from 'backup.latest'.
     """
 
-    log.debug('')
-    log.debug(
-        ts_msg(4, f'Start snapshot sequence: "{interval}" for: '
-                  f'{job.backup_src}')
-    )
+    log.debug(ts_msg(4, f'Start snapshot sequence: "{interval}" for: '
+                        f'{job.backup_src}'))
 
     snap = _init_snapshot(
         interval=interval,
@@ -236,3 +230,5 @@ def routine(job: Job):
             job=job,
             timestamp=timestamp,
         )
+
+    return True

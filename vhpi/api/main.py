@@ -25,7 +25,7 @@ from vhpi.api import backup, snapshot, health
 from vhpi.api.types import Job, Settings
 from vhpi.api.types import BackupRoot, Interval, KeepAmount, IntervalDuration
 import vhpi.constants as const
-from vhpi.api.logging import skip_msg, job_start_msg, ts_msg
+from vhpi.api.logging import skip_msg, job_start_msg, ts_msg, job_out_msg
 import vhpi.api.logging as log
 
 
@@ -144,13 +144,21 @@ def get_due_snapshots(
 def duty_check_routine(job: Job):
     """"""
     if not job.due_snapshots:
-        log.info(
-            skip_msg(True, job.due_snapshots, job.source_ip, job.backup_src))
+        log.info(skip_msg(
+            online=True,
+            due_jobs=job.due_snapshots,
+            ip=job.source_ip,
+            path=job.backup_src
+        ))
         return False
 
     if not health.is_machine_online(source_ip=job.source_ip):
-        log.info(
-            skip_msg(False, job.due_snapshots, job.source_ip, job.backup_src))
+        log.info(skip_msg(
+            online=False,
+            due_jobs=job.due_snapshots,
+            ip=job.source_ip,
+            path=job.backup_src
+        ))
         return False
 
     return True
@@ -184,22 +192,20 @@ def run_job(
         due_snapshots=job.due_snapshots
     ))
 
-    rsync_cmd = backup.build_rsync_command(
-        rsync_options=job.rsync_options,
-        backup_src=job.backup_src,
-        backup_latest=job.backup_latest,
-        excludes=job.excludes,
-        excl_lists=job.exclude_lists,
-        excl_lib=settings.exclude_lib,
-    )
-
-    backup.exec_rsync(
-        rsync_command=rsync_cmd,
+    if not backup.exec_rsync(
         job=job,
-    )
+        settings=settings,
+    ):
+        return
 
-    snapshot.routine(
+    if not snapshot.routine(
         job=job
+    ):
+        return
+
+    log.job_out_msg(
+        completed=True,
+        timestamp=time.time(),
     )
 
 

@@ -46,33 +46,51 @@ def is_machine_online(source_ip):
 
 
 def validate_machine_is_online(source_ip, init_time):
+    """"""
     if not is_machine_online(source_ip):
         log.info(
-            f'    Error: Source went offline: '
+            f'    Info: Source went offline: '
             f'{time.strftime(const.TIMESTAMP_FORMAT)}'
         )
-        log.error(job_out_msg(2, init_time))
+
+        log.error(job_out_msg(
+            skipped=True,
+            timestamp=init_time
+        ))
+
         return False
     return True
 
 
 def validate_backup_src(backup_src, init_time):
+    """"""
     if not os.path.exists(backup_src):
         log.critical(
-            f'    Error: Backup source does not exist.": '
+            f'    Info: Backup source does not exist.": '
             f'{backup_src}'
         )
-        log.error(job_out_msg(2, init_time))
+
+        log.error(job_out_msg(
+            skipped=True,
+            timestamp=init_time,
+        ))
+
         return False
     return True
 
 
 def validate_backup_dst(backup_dst, init_time):
+    """"""
     if not os.path.isdir(backup_dst):
         log.critical(
             f'    Error: Invalid Destination: {backup_dst}'
         )
-        log.error(job_out_msg(2, init_time))
+
+        log.error(job_out_msg(
+            skipped=True,
+            timestamp=init_time
+        ))
+
         return False
     return True
 
@@ -99,30 +117,38 @@ def initial_job_validation_routine(
     These checks are run directly on the cfg data, before the Job object is
     created.
     """
+    result = True
     backup_src = job_cfg.get('rsync_src')
     backup_dst = job_cfg.get('rsync_dst')
 
-    if not type(backup_src) == str:
+    if result and not type(backup_src) == str:
         log_cfg_type_err('rsync_src', 'string')
-        return False
+        result = False
 
-    if not type(backup_dst) == str:
+    if result and not type(backup_dst) == str:
         log_cfg_type_err('rsync_dst', 'string')
-        return False
+        result = False
 
-    if not backup_src[0] in ['/']:
+    if result and not backup_src[0] in ['/']:
         log_cfg_no_absolute_path_err('rsync_src')
-        return False
+        result = False
 
-    if not backup_dst[0] in ['/']:
+    if result and not backup_dst[0] in ['/']:
         log_cfg_no_absolute_path_err('rsync_dst')
-        return False
+        result = False
 
-    if not validate_backup_src(backup_src, init_time):
-        return False
+    if result and not validate_backup_src(backup_src, init_time):
+        result = False
 
-    if not validate_backup_dst(backup_dst, init_time):
-        return False
+    if result and not validate_backup_dst(backup_dst, init_time):
+        result = False
+
+    if not result:
+        log.error(job_out_msg(
+            timestamp=time.time(),
+            skipped=True,
+            message='Invalid Backup Job.'
+        ))
 
     return True
 

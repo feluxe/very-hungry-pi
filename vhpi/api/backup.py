@@ -14,12 +14,13 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with 'Very Hungry Pi'.  If not, see <http://www.gnu.org/licenses/>.
 
+import time
 import subprocess as sp
 from typing import List
 from vhpi.utils import clean_path
-from vhpi.api.types import BackupLatest, Job
+from vhpi.api.types import BackupLatest, Job, Settings
 from vhpi.api import health
-from vhpi.api.logging import ts_msg
+from vhpi.api.logging import ts_msg, job_out_msg
 import vhpi.api.logging as log
 
 
@@ -96,10 +97,21 @@ def log_output(output):
     log.info('')
 
 
-def exec_rsync(rsync_command: list, job: Job):
-    log.debug(ts_msg(4, 'Start: rsync execution.'))
+def exec_rsync(
+    job: Job,
+    settings: Settings
+):
+    """"""
+    rsync_command = build_rsync_command(
+        rsync_options=job.rsync_options,
+        backup_src=job.backup_src,
+        backup_latest=job.backup_latest,
+        excludes=job.excludes,
+        excl_lists=job.exclude_lists,
+        excl_lib=settings.exclude_lib,
+    )
 
-    return_val = True
+    log.debug(ts_msg(4, 'Start: rsync execution.'))
 
     try:
         log.debug('    Executing: ' + ' '.join(rsync_command))
@@ -123,17 +135,23 @@ def exec_rsync(rsync_command: list, job: Job):
         return_code = p.wait()
 
         if return_code == 20:
-            log.info(
-                f'   Info: Skipp current job due to rsync exit code (20)')
-
-            return_val = False
+            job_out_msg(
+                timestamp=time.time(),
+                message='Info: Skip current job due to rsync exit code (20)',
+                skipped=True,
+            )
+            return False
 
     except sp.SubprocessError as e:
-        log.error('    Error: An error occurred in rsync subprocess.')
+        log.error('    Error: An error occurred in the rsync subprocess.')
         log.debug(e)
-
-        return_val = False
+        job_out_msg(
+            timestamp=time.time(),
+            message='Rsync Execution Failed.',
+            skipped=True,
+        )
+        return False
 
     log.debug(ts_msg(4, 'End: rsync execution.\n'))
 
-    return return_val
+    return True
