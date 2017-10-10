@@ -73,7 +73,9 @@ def _shift(snap: Snap) -> None:
 
     len_base = len(snap.dst_base)
 
-    for path in glob(snap.dst_base + '[0-9]_[0-9]*'):
+    snaps_to_shift = glob(snap.dst_base + '[0-9]*_(?!tmp)')
+
+    for path in sorted(snaps_to_shift, reverse=True):
         num = re.match('[0-9]+', path[len_base:]).group()
         num = int(num)
 
@@ -218,9 +220,9 @@ def make(
             f'{timestamp.strftime("%H:%M:%S")}'
     )
 
-    _rm_deprecated_snaps(snap)
-
     _update_timestamp(snap)
+
+    _rm_deprecated_snaps(snap)
 
 
 def routine(job: Job):
