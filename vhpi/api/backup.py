@@ -152,6 +152,6 @@ def exec_rsync(
         )
         return False
 
-    log.debug(ts_msg(4, 'End: rsync execution.\n'))
+    log.debug(ts_msg(4, 'End: rsync execution.'))
 
     return True

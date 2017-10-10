@@ -16,6 +16,7 @@
 
 import os
 from glob import glob
+from datetime import datetime
 import subprocess as sub
 import time
 import re
@@ -188,12 +189,13 @@ def _init_snapshot(
 def make(
     interval: Interval,
     job: Job,
-    timestamp: int,
+    timestamp: datetime,
 ) -> None:
     """
     Create a new snapshot from 'backup.latest'.
     """
 
+    log.debug('')
     log.debug(ts_msg(4, f'Start snapshot sequence: "{interval}" for: '
                         f'{job.backup_src}'))
 
@@ -222,7 +224,7 @@ def make(
 
 
 def routine(job: Job):
-    timestamp = time.time()
+    timestamp = datetime.fromtimestamp(time.time())
 
     for interval in job.due_snapshots:
         make(
