@@ -176,7 +176,7 @@ def _init_snapshot(
 
     snap = Snap(
         backup_root=job.backup_root,
-        src=job.backup_latest,
+        src=clean_path(job.backup_latest),
         dst_base=dst_base,
         dst=dst,
         dst_tmp=dst_tmp,
