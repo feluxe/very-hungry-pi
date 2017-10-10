@@ -191,6 +191,7 @@ def _init_snapshot(
 def make(
     interval: Interval,
     job: Job,
+    timestamp: int,
 ) -> None:
     """
     Create a new snapshot from 'backup.latest'.
@@ -217,8 +218,8 @@ def make(
 
     os.rename(
         src=snap.dst_tmp,
-        dst=f'{snap.dst}_{time.strftime("%Y-%m-%d")}_'
-            f'{time.strftime("%H:%M:%S")}'
+        dst=f'{snap.dst}_{timestamp.strftime("%Y-%m-%d")}_'
+            f'{timestamp.strftime("%H:%M:%S")}'
     )
 
     _rm_deprecated_snaps(snap)
@@ -227,8 +228,11 @@ def make(
 
 
 def routine(job: Job):
+    timestamp = time.time()
+
     for interval in job.due_snapshots:
         make(
             interval=interval,
             job=job,
+            timestamp=timestamp,
         )
