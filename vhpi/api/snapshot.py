@@ -157,7 +157,9 @@ def _update_timestamp(snap: Snap) -> None:
     """"""
     log.debug(ts_msg(4, f'Update timestamp for "{snap.interval}".'))
 
-    timestamp_file = f'{snap.backup_root}/{const.TIMESTAMP_FILE_NAME}'
+    timestamp_file = clean_path(
+        f'{snap.backup_root}/{const.TIMESTAMP_FILE_NAME}'
+    )
     timestamps = load_yaml(timestamp_file, True) or {}
 
     timestamps[snap.interval] = time.strftime(const.TIMESTAMP_FORMAT)
