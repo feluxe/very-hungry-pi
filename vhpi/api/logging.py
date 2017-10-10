@@ -23,7 +23,11 @@ from logging.handlers import RotatingFileHandler
 import vhpi.constants as const
 
 
-def job_start_msg(
+############
+# Messages #
+############
+
+def _job_start_info(
     ip: str,
     src: str,
     due_snapshots: list,
@@ -35,10 +39,10 @@ def job_start_msg(
     msg += ' [Executing] ' + ip + '\t' + src + '\n'
     msg += '\n    Due: ' + ', '.join(due_snapshots)
 
-    return msg
+    return info(msg)
 
 
-def job_out_msg(
+def _job_out_info(
     timestamp: int,
     message: str = '',
     completed: bool = False,
@@ -65,46 +69,10 @@ def job_out_msg(
     elif unknown:
         new_msg += f'[Job Result Unknown] after: {duration} (h:m:s) {message}'
 
-    return f'\n{time.strftime(const.TIMESTAMP_FORMAT)} {new_msg}'
+    return info(f'\n{time.strftime(const.TIMESTAMP_FORMAT)} {new_msg}')
 
 
-def skip_msg(
-    online: bool,
-    due_jobs: list,
-    ip: str,
-    path: str
-) -> str:
-    """
-    This message is used to log a single line, that says a job is fine, but
-    not due or the source is offline.
-    """
-    state: str = 'online' if online else 'offline'
-    due_jobs: list = due_jobs or []
-    ip_str: str = fix_len(ip, 15, " ")
-    path_str: str = fix_len(path, 50, "·")
-    state_str: str = fix_len(state, 7, " ")
-    due_jobs_str: str = ', '.join(sorted(due_jobs))
-    due_str: str = f'Due: {due_jobs_str}' if due_jobs else 'No due jobs'
-
-    msg = f'[Skipped] [{ip_str}] [{path_str}] [Source {state_str}] [{due_str}]'
-
-    return time.strftime(const.TIMESTAMP_FORMAT) + ' ' + msg
-
-
-def ts_msg(
-    ind: int = 4,
-    msg: str = ''
-) -> str:
-    """
-    Create a message preceding a timestamp.
-    """
-    ind = ''.join([' ' for i in range(0, ind)])
-    ts = time.strftime(const.TIMESTAMP_FORMAT)
-
-    return f'{ind}{ts} {msg}'
-
-
-def fix_len(
+def _fix_len(
     string: str,
     limit: int,
     filler: str = '.',
@@ -143,6 +111,101 @@ def fix_len(
 
     return output
 
+
+def _skip_info(
+    online: bool,
+    due_jobs: list,
+    ip: str,
+    path: str
+) -> str:
+    """
+    This message is used to log a single line, that says a job is fine, but
+    not due or the source is offline.
+    """
+    state: str = 'online' if online else 'offline'
+    due_jobs: list = due_jobs or []
+    ip_str: str = _fix_len(ip, 15, " ")
+    path_str: str = _fix_len(path, 50, "·")
+    state_str: str = _fix_len(state, 7, " ")
+    due_jobs_str: str = ', '.join(sorted(due_jobs))
+    due_str: str = f'Due: {due_jobs_str}' if due_jobs else 'No due jobs'
+
+    msg = f'[Skipped] [{ip_str}] [{path_str}] [Source {state_str}] [{due_str}]'
+
+    return info(time.strftime(const.TIMESTAMP_FORMAT) + ' ' + msg)
+
+
+def _cfg_type_error(item, type_):
+    error(
+        f'[Error] Invalid config. "{item}" must be of type {type_}.'
+    )
+
+
+def _cfg_no_absolute_path_error(item):
+    error(
+        f'[Error] Invalid config. Please provide an absolute path for "{item}".'
+    )
+
+
+def _cfg_dst_not_exists_error(item):
+    error(
+        f'[Error] Invalid config. Destination does not exist: "{item}".'
+    )
+
+
+def _ts_msg_lvl0(
+    msg: str = ''
+) -> str:
+    """
+    Create a message preceding a timestamp.
+    """
+    ts = time.strftime(const.TIMESTAMP_FORMAT)
+
+    return f'{ts} {msg}'
+
+
+class lvl0:
+    job_start_info = _job_start_info
+    job_out_info = _job_out_info
+    skip_info = _skip_info
+    cfg_type_error = _cfg_type_error
+    cfg_no_absolute_path_error = _cfg_no_absolute_path_error
+    cfg_dst_not_exists_error = _cfg_dst_not_exists_error
+    ts_msg = _ts_msg_lvl0
+
+
+def _backup_src_not_exist_error(backup_src):
+    error(
+        f'    Error: Backup source does not exist.": {backup_src}'
+    )
+
+
+def _backup_dst_invalid_error(backup_dst):
+    error(
+        f'    Error: Invalid Destination: {backup_dst}'
+    )
+
+
+def _ts_msg_lvl1(
+    msg: str = ''
+) -> str:
+    """
+    Create a message preceding a timestamp.
+    """
+    ts = time.strftime(const.TIMESTAMP_FORMAT)
+
+    return f'    {ts} {msg}'
+
+
+class lvl1():
+    backup_src_not_exist_error = _backup_src_not_exist_error
+    backup_dst_invalid_error = _backup_dst_invalid_error
+    ts_msg = _ts_msg_lvl1
+
+
+##########
+# logger #
+##########
 
 def init(log_output_dir):
     global logger, info, debug, warning, error, critical

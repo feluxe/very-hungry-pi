@@ -19,8 +19,7 @@ import subprocess as sp
 from typing import List
 from vhpi.utils import clean_path
 from vhpi.api.types import BackupLatest, Job, Settings
-from vhpi.api import health
-from vhpi.api.logging import ts_msg, job_out_msg
+from vhpi.api import validate
 import vhpi.api.logging as log
 
 
@@ -61,6 +60,38 @@ def build_rsync_command(
     return ['rsync'] + options + excludes + [src, dst]
 
 
+def _terminate_sub_process(p):
+    if p.poll() is None:
+        p.terminate()
+        if p.poll() is None:
+            p.kill()
+
+
+def _run_rsync_monitor(job: Job, sub_process: sp.Popen):
+    """"""
+    duration = 1
+
+    while True:
+        # break if subprocess finished naturally.
+        if sub_process.poll() is not None:
+            return True
+
+        if not validate.is_machine_online(job.source_ip):
+            _terminate_sub_process(sub_process)
+            return 'source_offline'
+
+        if not validate.backup_src_exists(job.backup_src):
+            _terminate_sub_process(sub_process)
+            return 'no_src'
+
+        if not validate.backup_dst_is_dir(job.backup_root):
+            _terminate_sub_process(sub_process)
+            return 'no_dst'
+
+        duration = 30 if duration > 30 else duration * 2
+        time.sleep(duration)
+
+
 def matching_lines(self, level, needle, lines):
     """Filter a multi-line string for words.
     Each line that contains a certain word will be logged.
@@ -97,6 +128,42 @@ def log_output(output):
     log.info('')
 
 
+def _log_job_out_rsync_failed():
+    log.lvl0.job_out_info(
+        message='Rsync Execution Failed.',
+        skipped=True,
+        timestamp=time.time(),
+    )
+
+
+def handle_monitor_result(result):
+    if result == 'source_offline':
+        log.error(log.lvl1.ts_msg('Error: Source machine went offline'))
+        _log_job_out_rsync_failed()
+        return False
+
+    if result == 'no_src':
+        log.error(log.lvl1.ts_msg('Error: Backup Source not available.'))
+        _log_job_out_rsync_failed()
+        return False
+
+    if result == 'no_dst':
+        log.error(log.lvl1.ts_msg('Error: Backup Destination not available.'))
+        _log_job_out_rsync_failed()
+        return False
+
+    return True
+
+
+def _handle_rsync_return_codes(return_code):
+    if return_code == 20:
+        log.error(log.lvl1.ts_msg('Error: Source machine went offline'))
+        _log_job_out_rsync_failed()
+        return False
+
+    return True
+
+
 def exec_rsync(
     job: Job,
     settings: Settings
@@ -111,7 +178,7 @@ def exec_rsync(
         excl_lib=settings.exclude_lib,
     )
 
-    log.debug(ts_msg(4, 'Start: rsync execution.'))
+    log.debug(log.lvl1.ts_msg('Start: rsync execution.'))
 
     try:
         log.debug('    Executing: ' + ' '.join(rsync_command))
@@ -126,32 +193,28 @@ def exec_rsync(
             universal_newlines=True
         )
 
-        health.run_rsync_monitor(job, p)
-
-        # handle rsync exit codes
+        monitor_result = _run_rsync_monitor(job, p)
         output, err = p.communicate()
         log_output(output)
 
+        if not handle_monitor_result(monitor_result):
+            return False
+
         return_code = p.wait()
 
-        if return_code == 20:
-            job_out_msg(
-                timestamp=time.time(),
-                message='Info: Skip current job due to rsync exit code (20)',
-                skipped=True,
-            )
+        if not _handle_rsync_return_codes(return_code):
             return False
 
     except sp.SubprocessError as e:
-        log.error('    Error: An error occurred in the rsync subprocess.')
+        log.error(log.lvl1.ts_msg(
+            'Error: An error occurred in the rsync subprocess.'
+        ))
+
         log.debug(e)
-        job_out_msg(
-            timestamp=time.time(),
-            message='Rsync Execution Failed.',
-            skipped=True,
-        )
+
+        _log_job_out_rsync_failed()
         return False
 
-    log.debug(ts_msg(4, 'End: rsync execution.'))
+    log.debug(log.lvl1.ts_msg('End: rsync execution.'))
 
     return True

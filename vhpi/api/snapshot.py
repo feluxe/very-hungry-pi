@@ -22,7 +22,6 @@ import time
 import re
 from itertools import chain
 from typing import Union, List, NamedTuple
-from vhpi.api.logging import ts_msg
 import vhpi.api.logging as log
 from vhpi.utils import clean_path, load_yaml, save_yaml
 from vhpi.api.types import BackupRoot, BackupLatest, SnapDir, SnapDirTmp, \
@@ -44,8 +43,10 @@ def _create_hardlinks(snap: Snap) -> None:
     """
     Create hard-links with unix cp tool.
     """
-    log.debug(ts_msg(4, f'Create hardlinks: {snap.src.split("/")[-1]} '
-                        f'-> {snap.dst_tmp.split("/")[-1]}'))
+    log.debug(log.lvl1.ts_msg(
+        f'Create hardlinks: {snap.src.split("/")[-1]} '
+        f'-> {snap.dst_tmp.split("/")[-1]}'
+    ))
 
     cmd = ['cp', '-al', snap.src, snap.dst_tmp]
 
@@ -68,8 +69,9 @@ def _shift(snap: Snap) -> None:
     """
     Increase the num in the dir by one for selected snapshot interval type.
     """
-    log.debug(
-        ts_msg(4, f'Shift snapshot "{snap.interval}" in {snap.backup_root}'))
+    log.debug(log.lvl1.ts_msg(
+        f'Shift snapshot "{snap.interval}" in {snap.backup_root}'
+    ))
 
     len_base = len(snap.dst_base)
 
@@ -121,12 +123,9 @@ def _rm_snap(dir_: Union[SnapDir, SnapDirTmp]) -> None:
     Remove Snapshot directory.
     Uses unix rm instead of shutil.rmtree for better performance.
     """
-    log.debug(
-        ts_msg(
-            ind=4,
-            msg=f'Remove deprecated snapshot: {os.path.basename(dir_)}'
-        )
-    )
+    log.debug(log.lvl1.ts_msg(
+        f'Remove deprecated snapshot: {os.path.basename(dir_)}'
+    ))
 
     sub.check_call(['rm', '-rf', dir_])
 
@@ -138,7 +137,9 @@ def _rm_deprecated_snaps(snap: Snap):
     deprecated = _get_deprecated_snaps(snap)
 
     for snap_dir in deprecated:
-        log.debug(ts_msg(4, f'Deleting deprecated snapshot: {snap_dir}'))
+        log.debug(log.lvl1.ts_msg(
+            f'Deleting deprecated snapshot: {snap_dir}'
+        ))
 
         try:
             _rm_snap(str(snap_dir))
@@ -155,7 +156,9 @@ def _rm_deprecated_snaps(snap: Snap):
 
 def _update_timestamp(snap: Snap) -> None:
     """"""
-    log.debug(ts_msg(4, f'Update timestamp for "{snap.interval}".'))
+    log.debug(log.lvl1.ts_msg(
+        f'Update timestamp for "{snap.interval}".'
+    ))
 
     timestamp_file = clean_path(
         f'{snap.backup_root}/{const.TIMESTAMP_FILE_NAME}'
@@ -198,8 +201,9 @@ def make(
     """
 
     log.debug('')
-    log.debug(ts_msg(4, f'Start snapshot sequence: "{interval}" for: '
-                        f'{job.backup_src}'))
+    log.debug(log.lvl1.ts_msg(
+        f'Start snapshot sequence: "{interval}" for: {job.backup_src}'
+    ))
 
     snap = _init_snapshot(
         interval=interval,
@@ -234,5 +238,3 @@ def routine(job: Job):
             job=job,
             timestamp=timestamp,
         )
-
-    return True

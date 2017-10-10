@@ -18,7 +18,7 @@ jobs:
   - name: name1
     source_ip: localhost
     rsync_src: /home/felix/dev_projects/very_hungry_pi/vhpi2/tests/mock/src/
-    rsync_dst: /home/felix/dev_projects/very_hungry_pi/vhpi2/tests/mock/backup_root
+    rsync_dst: /home/felix/dev_projects/very_hungry_pi/vhpi2/tests/mock/backup_root/
     rsync_options: -aAHSvX --delete
     exclude_lists: [
       standard
