@@ -1,3 +1,6 @@
+# IMPORTANT: If you use paths that contain spaces, make sure to escape them
+# with \ (backslash). The same counts for escape items.
+
 # Basic App Settings:
 app_cfg:
   # Create different list of files/dirs that you want to exclude from your

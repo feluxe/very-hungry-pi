@@ -45,6 +45,9 @@ More details about the script in the wiki: ['What the script does in detail'](ht
 #### `~/.config/vhpi/vhpi_cfg.yaml`
 
  ```yaml  
+# IMPORTANT: If you use paths that contain spaces, make sure to escape them 
+# with \ (backslash). The same counts for escape items.
+
 # Basic App Settings:
 app_cfg:
   # Create different list of files/dirs that you want to exclude from your
@@ -98,9 +101,9 @@ jobs:
       yearly: 6
 
   # Source 2:
-  - name: 'Another Dummy Source'
-    source_ip: 192.168.178.36
-   # etc...'
+  # - name: 'Another Dummy Source'
+  #  source_ip: 192.168.178.36
+  # etc...'
  ```
  
 ## <a name="install"></a> Installation & Configuration
@@ -148,7 +151,7 @@ The results of each run is added to the log-files as well (`~/.config/vhpi/debug
 
 ### <a name="create_cronjob"></a> Create a Cronjob
 
-I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run *vhpi*. (in most cases that would be `root`))
+I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run *vhpi*.
 
 ```
 @hourly         username   vhpi run
@@ -158,7 +161,7 @@ NOTICE: You can use any time interval you like for the cronjob, but keep in mind
  You should also keep in mind that the more frequently *vhpi* is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run *vhpi* each hour or so. That way chances are higher that you get a daily backup. <br>
  **TL;DR** Run it hourly.
 
-You can also add multiple cronjobs that execute *vhpi* in different intervals for different users. Thou, In most cases it would be enough to run *vhpi* hourly by root. 
+You can also add multiple cronjobs that execute *vhpi* in different intervals for different users.
 
 After you added the cronjob, you should restart your Pi or restart the crontab like this:
 
