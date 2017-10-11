@@ -1,10 +1,13 @@
-
+import pypandoc
 from setuptools import setup, find_packages
 from buildlib.utils.yaml import load_yaml
 from codecs import open
 
-with open('README.md') as f:
-    long_description = f.read()
+try:
+    long_description = pypandoc.convert('README.md', 'rst')
+
+except(IOError, ImportError):
+    long_description = open('README.md').read()
 
 config = load_yaml('CONFIG.yaml')
 

@@ -78,8 +78,8 @@ def publish() -> None:
         ]):
             branch: str = git.prompt.branch()
 
-    should_push_gemfury: bool = build.prompt.should_push_gemfury(
-        default='y'
+    should_push_pypi: bool = build.prompt.should_push_pypi(
+        default='y' if should_update_version else 'n'
     )
 
     if run_any_git:
@@ -103,14 +103,9 @@ def publish() -> None:
                 git.push(branch)
             )
 
-    if should_push_gemfury:
+    if should_push_pypi:
         results.append(
-            build.push_python_wheel_to_gemfury(
-                wheel_file=find_python_wheel(
-                    wheel_dir='dist',
-                    semver_num=version
-                )
-            )
+            build.push_python_wheel_to_pypi()
         )
 
     print(h3('Publish Results'))
