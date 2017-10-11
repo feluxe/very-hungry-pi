@@ -179,7 +179,7 @@ def exec_rsync(
         excl_lib=settings.exclude_lib,
     )
 
-    log.debug(log.lvl1.ts_msg('Start: rsync execution.'))
+    log.debug(log.lvl1.ts_msg('\nStart: rsync execution.'))
 
     try:
         log.debug('    Executing: ' + ' '.join(rsync_command))

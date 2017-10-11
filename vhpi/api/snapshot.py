@@ -230,13 +230,17 @@ def make(
             f'{timestamp.strftime("%H:%M:%S")}'
     )
 
-    # _update_timestamp(snap)
+    _update_timestamp(snap)
 
     _rm_deprecated_snaps(snap)
+
+    log.info(log.lvl1.ts_msg(f'Completed Snapshot: {snap.interval}'))
 
 
 def routine(job: Job):
     timestamp = datetime.fromtimestamp(time.time())
+
+    log.info(f'    [Snapshot Log]')
 
     for interval in job.due_snapshots:
         make(
