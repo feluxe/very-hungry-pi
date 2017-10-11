@@ -89,7 +89,7 @@ def _run_rsync_monitor(job: Job, sub_process: sp.Popen):
             _terminate_sub_process(sub_process)
             return 'no_dst'
 
-        duration = 30 if duration > 30 else duration * 2
+        duration = 120 if duration > 120 else duration * 2
         time.sleep(duration)
 
 
@@ -157,7 +157,7 @@ def handle_monitor_result(result, init_time):
 
 def _handle_rsync_return_codes(return_code, init_time):
     if return_code == 20:
-        log.error(log.lvl1.ts_msg('Error: Source machine went offline'))
+        log.error(log.lvl1.ts_msg('Error Code 20: Source machine went offline'))
         _log_job_out_rsync_failed(init_time)
         return False
 
