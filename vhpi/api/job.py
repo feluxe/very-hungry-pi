@@ -202,5 +202,5 @@ def run(
 
     log.lvl0.job_out_info(
         completed=True,
-        timestamp=time.time(),
+        init_time=init_time,
     )

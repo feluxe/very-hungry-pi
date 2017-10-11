@@ -1,6 +1,7 @@
 # Copyright (C) 2016-2017 Felix Meyer-Wolters
 #
-# This file is part of 'Very Hungry Pi' (vhpi) - An application to create backups.
+# This file is part of 'Very Hungry Pi' (vhpi) - An application to create
+# backups.
 #
 # 'Very Hungry Pi' is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License v3 as published by
@@ -128,37 +129,37 @@ def log_output(output):
     log.info('')
 
 
-def _log_job_out_rsync_failed():
+def _log_job_out_rsync_failed(init_time):
     log.lvl0.job_out_info(
         message='Rsync Execution Failed.',
         skipped=True,
-        timestamp=time.time(),
+        init_time=init_time,
     )
 
 
-def handle_monitor_result(result):
+def handle_monitor_result(result, init_time):
     if result == 'source_offline':
         log.error(log.lvl1.ts_msg('Error: Source machine went offline'))
-        _log_job_out_rsync_failed()
+        _log_job_out_rsync_failed(init_time)
         return False
 
     if result == 'no_src':
         log.error(log.lvl1.ts_msg('Error: Backup Source not available.'))
-        _log_job_out_rsync_failed()
+        _log_job_out_rsync_failed(init_time)
         return False
 
     if result == 'no_dst':
         log.error(log.lvl1.ts_msg('Error: Backup Destination not available.'))
-        _log_job_out_rsync_failed()
+        _log_job_out_rsync_failed(init_time)
         return False
 
     return True
 
 
-def _handle_rsync_return_codes(return_code):
+def _handle_rsync_return_codes(return_code, init_time):
     if return_code == 20:
         log.error(log.lvl1.ts_msg('Error: Source machine went offline'))
-        _log_job_out_rsync_failed()
+        _log_job_out_rsync_failed(init_time)
         return False
 
     return True
@@ -197,12 +198,18 @@ def exec_rsync(
         output, err = p.communicate()
         log_output(output)
 
-        if not handle_monitor_result(monitor_result):
+        if not handle_monitor_result(
+            result=monitor_result,
+            init_time=job.init_time,
+        ):
             return False
 
         return_code = p.wait()
 
-        if not _handle_rsync_return_codes(return_code):
+        if not _handle_rsync_return_codes(
+            return_code=return_code,
+            init_time=job.init_time
+        ):
             return False
 
     except sp.SubprocessError as e:
@@ -212,7 +219,7 @@ def exec_rsync(
 
         log.debug(e)
 
-        _log_job_out_rsync_failed()
+        _log_job_out_rsync_failed(job.init_time)
         return False
 
     log.debug(log.lvl1.ts_msg('End: rsync execution.'))

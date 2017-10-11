@@ -43,7 +43,7 @@ def _job_start_info(
 
 
 def _job_out_info(
-    timestamp: int,
+    init_time: int,
     message: str = '',
     completed: bool = False,
     skipped: bool = False,
@@ -53,7 +53,7 @@ def _job_out_info(
     """
     This message is used to log execution results of a job.
     """
-    seconds = time.time() - timestamp
+    seconds = time.time() - init_time
     duration = time.strftime('%H:%M:%S', time.gmtime(seconds))
     new_msg = ''
 

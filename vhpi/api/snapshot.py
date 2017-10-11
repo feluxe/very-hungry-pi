@@ -1,6 +1,7 @@
 # Copyright (C) 2016-2017 Felix Meyer-Wolters
 #
-# This file is part of 'Very Hungry Pi' (vhpi) - An application to create backups.
+# This file is part of 'Very Hungry Pi' (vhpi) - An application to create
+# backups.
 #
 # 'Very Hungry Pi' is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License v3 as published by
@@ -75,7 +76,12 @@ def _shift(snap: Snap) -> None:
 
     len_base = len(snap.dst_base)
 
-    snaps_to_shift = glob(snap.dst_base + '[0-9]*_(?!tmp)')
+    snaps_to_shift = [
+        item
+        for item
+        in glob(snap.dst_base + '[0-9]*_*')
+        if not re.match(snap.dst_base + '[0-9]*_tmp', item)
+    ]
 
     for path in sorted(snaps_to_shift, reverse=True):
         num = re.match('[0-9]+', path[len_base:]).group()
@@ -224,7 +230,7 @@ def make(
             f'{timestamp.strftime("%H:%M:%S")}'
     )
 
-    _update_timestamp(snap)
+    # _update_timestamp(snap)
 
     _rm_deprecated_snaps(snap)
 

@@ -1,6 +1,7 @@
 # Copyright (C) 2016-2017 Felix Meyer-Wolters
 #
-# This file is part of 'Very Hungry Pi' (vhpi) - An application to create backups.
+# This file is part of 'Very Hungry Pi' (vhpi) - An application to create
+# backups.
 #
 # 'Very Hungry Pi' is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License v3 as published by
