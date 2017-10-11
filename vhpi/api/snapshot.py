@@ -68,7 +68,7 @@ def _create_hardlinks(snap: Snap) -> None:
 
 
 def _split_num_from_path(path, interval):
-    last_bit = re.search(f'_{interval}_[0-9]+', path).group()
+    last_bit = re.search(f'_{interval}\.[0-9]+', path).group()
     num = int(re.search(f'[0-9]+', last_bit).group())
     path_without_num = path[0:-len(str(num))]
 
@@ -87,7 +87,7 @@ def _shift(snap: Snap) -> None:
         item
         for item
         in glob(f'{snap.backup_root}/*')
-        if f'_{snap.interval}_' in item
+        if f'_{snap.interval}.' in item
     ]
 
     for path in sorted(snaps_to_shift, reverse=True):
@@ -115,7 +115,7 @@ def _get_deprecated_snaps(snap: Snap) -> Union[List[SnapDir], list]:
         item
         for item
         in glob(f'{snap.backup_root}/*')
-        if f'_{snap.interval}_' in item
+        if f'_{snap.interval}.' in item
            and _split_num_from_path(item, snap.interval)[1] in keep_range
     ]
 
@@ -123,7 +123,7 @@ def _get_deprecated_snaps(snap: Snap) -> Union[List[SnapDir], list]:
         item
         for item
         in glob(f'{snap.backup_root}*')
-        if f'_{snap.interval}_' in item
+        if f'_{snap.interval}.' in item
            and item not in snaps_to_keep
     ]
 
@@ -191,7 +191,7 @@ def _init_snapshot(
     # dst = f'{dst_base}0'
     # dst_tmp = f'{dst}_tmp'
     base_pattern = f'{job.backup_root}/[0-9]{4}-[0-9]{2}-[0-9]{2}' \
-                   f'_[0-9]{2}:[0-9]{2}:[0-9]{2}_{interval}_'
+                   f'__[0-9]{2}:[0-9]{2}:[0-9]{2}__{interval}.'
 
     snap = Snap(
         backup_root=job.backup_root,
@@ -199,7 +199,7 @@ def _init_snapshot(
         # dst_base=dst_base,
         # dst=dst,
         # dst_tmp=dst_tmp,
-        dst_tmp=clean_path(f'{job.backup_root}/{interval}_tmp'),
+        dst_tmp=clean_path(f'{job.backup_root}/{interval}.tmp'),
         base_pattern=base_pattern,
         interval=interval,
         keep_amount=job.snapshots.get(interval),
@@ -235,11 +235,11 @@ def make(
 
     os.rename(
         src=snap.dst_tmp,
-        dst=f'{snap.backup_root}/{timestamp.strftime("%Y-%m-%d_%H:%M:%S")}_'
-            f'{snap.interval}_0'
+        dst=f'{snap.backup_root}/{timestamp.strftime("%Y-%m-%d__%H:%M:%S")}__'
+            f'{snap.interval}.0'
     )
 
-    # _update_timestamp(snap)
+    _update_timestamp(snap)
 
     _rm_deprecated_snaps(snap)
 
