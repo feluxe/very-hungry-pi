@@ -71,7 +71,7 @@ def _terminate_sub_process(p):
 
 def _run_rsync_monitor(job: Job, sub_process: sp.Popen):
     """"""
-    duration = 60
+    duration = 1
 
     while True:
         return_code = sub_process.poll()
@@ -91,6 +91,8 @@ def _run_rsync_monitor(job: Job, sub_process: sp.Popen):
         if not validate.backup_dst_is_dir(job.backup_root):
             _terminate_sub_process(sub_process)
             return 'no_dst'
+
+        duration = 60 if duration > 60 else duration * 2
 
         time.sleep(duration)
 
