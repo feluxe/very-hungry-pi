@@ -16,6 +16,7 @@
 # along with 'Very Hungry Pi'.  If not, see <http://www.gnu.org/licenses/>.
 
 import time
+import threading
 import subprocess as sp
 from typing import List
 from vhpi.utils import clean_path
@@ -73,9 +74,11 @@ def _run_rsync_monitor(job: Job, sub_process: sp.Popen):
     duration = 1
 
     while True:
+        return_code = sub_process.poll()
+
         # break if subprocess finished naturally.
-        if sub_process.poll() is not None:
-            return True
+        if return_code is not None:
+            return return_code
 
         if not validate.is_machine_online(job.source_ip):
             _terminate_sub_process(sub_process)
@@ -162,6 +165,20 @@ def _handle_rsync_return_codes(return_code, init_time):
     return True
 
 
+def _rsync_output(p):
+    for line in p.stdout:
+        _log_line(line)
+
+
+def _async_log_subprocess_output(p):
+    output_stream = threading.Thread(
+        target=_rsync_output,
+        args=(p,)
+    )
+    output_stream.setDaemon(True)
+    output_stream.start()
+
+
 def exec_rsync(
     job: Job,
     settings: Settings
@@ -194,23 +211,18 @@ def exec_rsync(
             universal_newlines=True
         )
 
-        # monitor_result = _run_rsync_monitor(job, p)
-        import threading
-        rsync_monitor = threading.Thread(target=)
+        _async_log_subprocess_output(p)
 
-        for line in p.stdout:
-            _log_line(line)
+        monitor_result = _run_rsync_monitor(job, p)
 
-        # if not handle_monitor_result(
-        #     result=monitor_result,
-        #     init_time=job.init_time,
-        # ):
-        #     return False
-
-        return_code = p.wait()
+        if not handle_monitor_result(
+            result=monitor_result,
+            init_time=job.init_time,
+        ):
+            return False
 
         if not _handle_rsync_return_codes(
-            return_code=return_code,
+            return_code=monitor_result,
             init_time=job.init_time
         ):
             return False
