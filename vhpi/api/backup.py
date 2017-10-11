@@ -107,25 +107,23 @@ def matching_lines(self, level, needle, lines):
     dynamic_func(matches_str) if len(matches) > 0 else None
 
 
-def log_output(output):
-    log.debug('    ' + output.replace('\n', '\n    '))
+def _log_line(line):
+    line = line.replace('\n', '')
 
-    log.debug('    [Rsync Log Summary]')
-    log.debug('')
-
-    for line in output.splitlines():
-        if 'error:' in line:
-            log.error(f'    {line}')
-        elif 'IO error' in line:
-            log.error(f'    {line}')
-        elif 'rsync:' in line:
-            log.warning(f'    {line}')
-        elif 'warning:' in line:
-            log.warning(f'    {line}')
-        elif 'bytes/sec' in line:
-            log.info(f'    {line}')
-        elif 'total size is ' in line:
-            log.info(f'    {line}')
+    if 'error:' in line:
+        log.error(f'    {line}')
+    elif 'IO error' in line:
+        log.error(f'    {line}')
+    elif 'rsync:' in line:
+        log.warning(f'    {line}')
+    elif 'warning:' in line:
+        log.warning(f'    {line}')
+    elif 'bytes/sec' in line:
+        log.info(f'    {line}')
+    elif 'total size is ' in line:
+        log.info(f'    {line}')
+    elif line.strip():
+        log.debug(f'    {line}')
 
 
 def _log_job_out_rsync_failed(init_time):
@@ -184,6 +182,7 @@ def exec_rsync(
 
     try:
         log.debug('    Executing: ' + ' '.join(rsync_command))
+        log.debug('')
 
         p = sp.Popen(
             rsync_command,
@@ -195,15 +194,18 @@ def exec_rsync(
             universal_newlines=True
         )
 
-        monitor_result = _run_rsync_monitor(job, p)
-        output, err = p.communicate()
-        log_output(output)
+        # monitor_result = _run_rsync_monitor(job, p)
+        import threading
+        rsync_monitor = threading.Thread(target=)
 
-        if not handle_monitor_result(
-            result=monitor_result,
-            init_time=job.init_time,
-        ):
-            return False
+        for line in p.stdout:
+            _log_line(line)
+
+        # if not handle_monitor_result(
+        #     result=monitor_result,
+        #     init_time=job.init_time,
+        # ):
+        #     return False
 
         return_code = p.wait()
 
@@ -223,6 +225,7 @@ def exec_rsync(
         _log_job_out_rsync_failed(job.init_time)
         return False
 
+    log.debug('')
     log.debug(log.lvl1.ts_msg('End: rsync execution.'))
 
     return True

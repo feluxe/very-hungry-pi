@@ -229,7 +229,7 @@ def make(
             f'{timestamp.strftime("%H:%M:%S")}'
     )
 
-    _update_timestamp(snap)
+    # _update_timestamp(snap)
 
     _rm_deprecated_snaps(snap)
 
