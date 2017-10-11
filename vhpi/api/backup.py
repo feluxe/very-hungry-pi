@@ -108,10 +108,10 @@ def matching_lines(self, level, needle, lines):
 
 
 def log_output(output):
-    log.debug('\n    [Rsync Log]:')
     log.debug('    ' + output.replace('\n', '\n    '))
 
-    log.info('\n    [Rsync Log Summary]:')
+    log.debug('    [Rsync Log Summary]')
+    log.debug('')
 
     for line in output.splitlines():
         if 'error:' in line:
@@ -126,7 +126,6 @@ def log_output(output):
             log.info(f'    {line}')
         elif 'total size is ' in line:
             log.info(f'    {line}')
-    log.info('')
 
 
 def _log_job_out_rsync_failed(init_time):
@@ -179,7 +178,9 @@ def exec_rsync(
         excl_lib=settings.exclude_lib,
     )
 
-    log.debug(log.lvl1.ts_msg('\nStart: rsync execution.'))
+    log.info('\n    [Rsync Log]')
+    log.debug('')
+    log.debug(log.lvl1.ts_msg('Start: rsync execution.'))
 
     try:
         log.debug('    Executing: ' + ' '.join(rsync_command))

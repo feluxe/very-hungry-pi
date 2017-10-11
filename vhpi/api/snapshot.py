@@ -206,7 +206,6 @@ def make(
     Create a new snapshot from 'backup.latest'.
     """
 
-    log.debug('')
     log.debug(log.lvl1.ts_msg(
         f'Start snapshot sequence: "{interval}" for: {job.backup_src}'
     ))
@@ -235,12 +234,14 @@ def make(
     _rm_deprecated_snaps(snap)
 
     log.info(log.lvl1.ts_msg(f'Completed Snapshot: {snap.interval}'))
+    log.debug('')
 
 
 def routine(job: Job):
     timestamp = datetime.fromtimestamp(time.time())
 
-    log.info(f'    [Snapshot Log]')
+    log.info(f'\n    [Snapshot Log]')
+    log.debug('')
 
     for interval in job.due_snapshots:
         make(
