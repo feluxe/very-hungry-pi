@@ -112,7 +112,7 @@ jobs:
 ### Sharing sources with the Pi:
 
 Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba` (There are plenty tutorials for this on the www).
-Perhaps *vhpi* can also create local backups as well.
+Perhaps *vhpi* can create local backups as well.
 
 You should use `autofs` or similar to automatically mount the shared directories with your Pi whenever they are available. This way your Pi will automatically mount the directories whenever a machine enters the network.
 
@@ -135,19 +135,19 @@ It should print the help text to the terminal.
 
 ### Configure vhpi:
 
-Pip creates a config dir at `~/.config/vhpi/`, there you should fine a file `vhpi_cfg.yaml`. This is where you configure your backup jobs. The config file is pretty self explanatory, just have a look at the [Example Config](#example_config)
+When you run *vhpi* for the first time, it creates a config dir at `~/.config/vhpi/`, you'll find a file called `vhpi_cfg.yaml` there. This is where you configure your backups. The config file is pretty self explanatory, just have a look at the [Example Config](#example_config)
 
 
 ### Test the configuration 
 
-In order to test *vhpi* I suggest setting up some dummy backup sources that point to some save destinations. Maybe in the `/tmp` dir or so. Then just run the following command a couple of times and see if the destination gets filled with backups/snapshots, the way you wish:
+In order to test *vhpi* I suggest setting up some dummy backup sources that point to some safe destinations. Maybe in the `/tmp` dir or so. Then just run the following command a couple of times and see if the destination gets filled with backups/snapshots, the way you wish:
 
  ```
  $ vhpi run
  ```
  
-If you get an error try to adjust the config. If you think there is a bug feel free to use the [github issue tracker](https://github.com/feluxe/very_hungry_pi/issues).
-The results of each run is added to the log-files as well (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
+If you get an error try to adjust the config. If you think there is a bug feel free to use the [github issue tracker](https://github.com/feluxe/very_hungry_pi/issues)!
+The results of each run is written to the log-files as well (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
 
 ### <a name="create_cronjob"></a> Create a Cronjob
 
@@ -157,8 +157,8 @@ I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so
 @hourly         username   vhpi run
 ```
 
-NOTICE: You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval that you use. E.g. if you want to create hourly snapshots the cronjob should run *vhpi* at least every hour, otherwise you won't get a snapshot for each hour.
- You should also keep in mind that the more frequently *vhpi* is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run *vhpi* each hour or so. That way chances are higher that you get a daily backup. <br>
+*NOTICE: You can use any time interval you like for the cronjob, but keep in mind that the time interval should be at least as small as the smallest snapshot interval that you use. E.g. if you want to create hourly snapshots the cronjob should run *vhpi* at least every hour, otherwise you won't get a snapshot for each hour.
+ You should also keep in mind that the more frequently *vhpi* is run by your cronjob, the higher is the chance you get a new backup. E.g. if you use a cronjob that only starts every 24 hours, chances are high that you won't get a backup for several days in a row, because your client machines might be offline at the particular time your cronjob fires. So even if your smallest snapshot is supposed to happen daily, you should consider making the cronjob run *vhpi* each hour or so. That way chances are higher that you get a daily backup.* <br>
  **TL;DR** Run it hourly.
 
 You can also add multiple cronjobs that execute *vhpi* in different intervals for different users.
@@ -169,5 +169,5 @@ After you added the cronjob, you should restart your Pi or restart the crontab l
 $ /etc/init.d/cron restart
 ```
 
-If this is all done, your Pi should run *vhpi* every hour and you should see some activity in the log files and of cause on your hard drive. Yay!
+If this is all done, your Pi should run *vhpi* every hour and you should see some activity in the log files and of cause on your hard drive. Yay! :D
 
