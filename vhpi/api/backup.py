@@ -74,8 +74,6 @@ def _run_rsync_monitor(job: Job, sub_process: sp.Popen):
 
     while True:
         # break if subprocess finished naturally.
-        log.debug('Rsync Monitor Routine LC')
-
         if sub_process.poll() is not None:
             return True
 
@@ -198,15 +196,8 @@ def exec_rsync(
         )
 
         monitor_result = _run_rsync_monitor(job, p)
-
-        log.debug('Out of Monitor Routine')
-
         output, err = p.communicate()
-
-        log.debug('Behind communicate()')
-
         log_output(output)
-
 
         if not handle_monitor_result(
             result=monitor_result,
@@ -216,8 +207,6 @@ def exec_rsync(
 
         return_code = p.wait()
 
-        log.debug('Behind p.wait()')
-        
         if not _handle_rsync_return_codes(
             return_code=return_code,
             init_time=job.init_time
