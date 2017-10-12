@@ -1,11 +1,12 @@
 # Very Hungry Pi
 <img src="assets/slideshow.gif" alt="slideshow" />
 
-## News: Version 2 (beta) released.
+## News
+
+### Version 2 (beta) released.
 
 I'm happy to announce Version 2 (beta) of *vhpi*.
-It's an entire rewrite. There is a `vhpi` package now on [pypi](https://pypi.python.org/pypi/vhpi) and a simple command line interface to run *vhpi* more conveniently. See CHANGELOG.md for more info.
-There are some minor breaking Changes in the config. The most important thing to notice, if you upgrade from v1 to v2, is that the snapshot directories have a new naming convention. `monthly.1` would now be `2017-10-11__02:07:03__monthly.1`. The timestamp tells you when the backup was finished. If you want to use your current snapshots with v2, you should adjust their names accordingly.
+It's an entire rewrite. There is a `vhpi` package now on [pypi](https://pypi.python.org/pypi/vhpi) and a simple command line interface to run *vhpi* more conveniently. There are some minor breaking Changes in the config. The most important thing to notice, if you upgrade from v1 to v2, is that the snapshot directories have a new naming convention. `monthly.1` would now be `2017-10-11__02:07:03__monthly.1`. The timestamp tells you when the backup was finished. If you want to use your current snapshots with v2, you should adjust their names accordingly. See CHANGELOG.md for more changes.
 
 ## Contents
 * [Description](#description)
