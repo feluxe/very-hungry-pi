@@ -3,8 +3,9 @@
 
 ### Future
 
-- [ ] Dupe Replacement feature. (See issues #5)
-- [ ] Add feature to load exclude-lists from files. Use build in rsync functionality for that. (See issues #4)
+- [] Create webserver/interface to show log files and basic health status.
+- [] Dupe Replacement feature. (See issues #5)
+- [] Add feature to load exclude-lists from files. Use build in rsync functionality for that. (See issues #4)
 
 ### v2.0
 
