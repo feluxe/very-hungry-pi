@@ -3,7 +3,6 @@
 
 ### Future
 
-- [ ] NFS Tutorial
 - [ ] Dupe Replacement feature. (See #5)
 - [ ] Add feature to load exclude-lists from files. Use build in rsync functionality for that. (See #4)
 
@@ -22,6 +21,7 @@
 - [x] Provide a simple command line interface to run vhpi. (see `vhpi --help`)
 - [x] Fix a bunch of bugs.
 - [x] Improve test strategy.
+- [x] Share sources with the pi via NFS (Tutorial)
 - [x] Use AGPL (license).
 
 ### v1.0

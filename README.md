@@ -122,6 +122,8 @@ Perhaps *vhpi* can create local backups as well.
 
 You should use `autofs` or similar to automatically mount the shared directories with your Pi whenever they are available. This way your Pi will automatically mount the directories whenever a machine enters the network.
 
+There is a tutorial in the wiki: [How to share sources with your Raspberry Pi using NFS.](https://github.com/feluxe/very_hungry_pi/wiki/How-to-share-sources-with-your-Raspberry-Pi-using-NFS.)
+
 
 ### Download and Install:
 
