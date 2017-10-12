@@ -19,7 +19,7 @@ import os
 import subprocess as sp
 
 
-def is_machine_online(source_ip):
+def is_machine_online(source_ip: str) -> bool:
     """"""
     try:
         sp.check_output(["ping", "-c", "1", source_ip])
@@ -29,9 +29,9 @@ def is_machine_online(source_ip):
         return False
 
 
-def backup_src_exists(src):
+def backup_src_exists(src: str) -> bool:
     return os.path.exists(src)
 
 
-def backup_dst_is_dir(dst):
+def backup_dst_is_dir(dst: str) -> bool:
     return os.path.isdir(dst)

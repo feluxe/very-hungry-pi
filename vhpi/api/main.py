@@ -23,7 +23,7 @@ import vhpi.constants as const
 import vhpi.api.logging as log
 
 
-def check_lock(lockfile):
+def _check_lock(lockfile: str):
     """
     Check if another instance of the script is already running by using the
     'flock' mechanism. If another instance is already running: exit app.
@@ -42,7 +42,7 @@ def check_lock(lockfile):
     return lockfile
 
 
-def _initial_app_validation_routine(cfg: dict):
+def _initial_app_validation_routine(cfg: dict) -> None:
     """
     These checks are to validate the user config (app_cfg part).
     You may only use lvl0 log output here.
@@ -59,7 +59,7 @@ def _initial_app_validation_routine(cfg: dict):
 
 def run(cfg: dict):
     """"""
-    lock = check_lock(f'{const.APP_CFG_DIR}/lock')
+    lock: str = _check_lock(f'{const.APP_CFG_DIR}/lock')
 
     _initial_app_validation_routine(cfg)
 

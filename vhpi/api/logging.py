@@ -21,6 +21,8 @@ import logging
 import logging.config
 from logging.handlers import RotatingFileHandler
 import vhpi.constants as const
+from typing import List
+from vhpi.api.types import Interval
 
 
 ############
@@ -30,7 +32,7 @@ import vhpi.constants as const
 def _job_start_info(
     ip: str,
     src: str,
-    due_snapshots: list,
+    due_snapshots: List[Interval],
 ) -> str:
     """
     Log message for starting a new backup job
@@ -43,7 +45,7 @@ def _job_start_info(
 
 
 def _job_out_info(
-    init_time: int,
+    init_time: float,
     message: str = '',
     completed: bool = False,
     skipped: bool = False,
@@ -53,8 +55,8 @@ def _job_out_info(
     """
     This message is used to log execution results of a job.
     """
-    seconds = time.time() - init_time
-    duration = time.strftime('%H:%M:%S', time.gmtime(seconds))
+    seconds: float = time.time() - init_time
+    duration: int = time.strftime('%H:%M:%S', time.gmtime(seconds))
     new_msg = ''
 
     if completed:
@@ -69,7 +71,7 @@ def _job_out_info(
     elif unknown:
         new_msg += f'[Job Result Unknown] after: {duration} (h:m:s) {message}'
 
-    return info(f'\n{time.strftime(const.TIMESTAMP_FORMAT)} {new_msg}')
+    info(f'\n{time.strftime(const.TIMESTAMP_FORMAT)} {new_msg}')
 
 
 def _fix_len(
@@ -87,27 +89,27 @@ def _fix_len(
     out.
     """
     output = ''
-    str_len = len(string)
+    str_len: int = len(string)
 
     if str_len == limit:
-        output = string
+        output: str = string
 
     elif str_len > limit:
-        cut_len = str_len + len(rpl) - limit
-        slice_start = ceil((str_len - cut_len) / 2)
-        slice_end = slice_start + cut_len
+        cut_len: int = str_len + len(rpl) - limit
+        slice_start: int = ceil((str_len - cut_len) / 2)
+        slice_end: int = slice_start + cut_len
 
         if cut_len <= str_len:
-            output = string.replace(string[slice_start:slice_end], rpl)
+            output: str = string.replace(string[slice_start:slice_end], rpl)
 
         else:
-            output = rpl
+            output: str = rpl
 
         if len(output) > limit:
-            output = output[:limit - len(output)]
+            output: str = output[:limit - len(output)]
 
     elif str_len < limit:
-        output = string + (filler * (limit - str_len))
+        output: str = string + (filler * (limit - str_len))
 
     return output
 
@@ -132,22 +134,25 @@ def _skip_info(
 
     msg = f'[Skipped] [{ip_str}] [{path_str}] [Source {state_str}] [{due_str}]'
 
-    return info(time.strftime(const.TIMESTAMP_FORMAT) + ' ' + msg)
+    info(f'{time.strftime(const.TIMESTAMP_FORMAT)} {msg}')
 
 
-def _cfg_type_error(item, type_):
+def _cfg_type_error(
+    item: str,
+    type_: str,
+) -> None:
     error(
         f'[Error] Invalid config. "{item}" must be of type {type_}.'
     )
 
 
-def _cfg_no_absolute_path_error(item):
+def _cfg_no_absolute_path_error(item: str) -> None:
     error(
         f'[Error] Invalid config. Please provide an absolute path for "{item}".'
     )
 
 
-def _cfg_dst_not_exists_error(item):
+def _cfg_dst_not_exists_error(item: str) -> None:
     error(
         f'[Error] Invalid config. Destination does not exist: "{item}".'
     )
@@ -159,7 +164,7 @@ def _ts_msg_lvl0(
     """
     Create a message preceding a timestamp.
     """
-    ts = time.strftime(const.TIMESTAMP_FORMAT)
+    ts: str = time.strftime(const.TIMESTAMP_FORMAT)
 
     return f'{ts} {msg}'
 
@@ -174,13 +179,13 @@ class lvl0:
     ts_msg = _ts_msg_lvl0
 
 
-def _backup_src_not_exist_error(backup_src):
+def _backup_src_not_exist_error(backup_src: str) -> None:
     error(
         f'    Error: Backup source does not exist.": {backup_src}'
     )
 
 
-def _backup_dst_invalid_error(backup_dst):
+def _backup_dst_invalid_error(backup_dst: str) -> None:
     error(
         f'    Error: Invalid Destination: {backup_dst}'
     )
@@ -192,7 +197,7 @@ def _ts_msg_lvl1(
     """
     Create a message preceding a timestamp.
     """
-    ts = time.strftime(const.TIMESTAMP_FORMAT)
+    ts: str = time.strftime(const.TIMESTAMP_FORMAT)
 
     return f'    {ts} {msg}'
 
@@ -207,7 +212,7 @@ class lvl1():
 # logger #
 ##########
 
-def init(log_output_dir):
+def init(log_output_dir: str) -> None:
     global logger, info, debug, warning, error, critical
 
     if logger:

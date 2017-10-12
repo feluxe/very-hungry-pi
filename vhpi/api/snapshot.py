@@ -21,8 +21,7 @@ from datetime import datetime
 import subprocess as sub
 import time
 import re
-from itertools import chain
-from typing import Union, List, NamedTuple, Pattern
+from typing import Union, List, NamedTuple, Tuple, Dict
 import vhpi.api.logging as log
 from vhpi.utils import clean_path, load_yaml, save_yaml
 from vhpi.api.types import BackupRoot, BackupLatest, SnapDir, SnapDirTmp, \
@@ -33,10 +32,8 @@ import vhpi.constants as const
 class Snap(NamedTuple):
     backup_root: BackupRoot
     src: BackupLatest
-    # dst_base: str
-    # dst: SnapDir
     dst_tmp: SnapDirTmp
-    base_pattern: Pattern
+    base_pattern: str
     interval: Interval
     keep_amount: KeepAmount
 
@@ -67,10 +64,14 @@ def _create_hardlinks(snap: Snap) -> None:
         log.debug('\n    ' + output)
 
 
-def _split_num_from_path(path, interval):
-    last_bit = re.search(f'_{interval}\.[0-9]+', path).group()
+def _split_num_from_path(
+    path: str,
+    interval: Interval,
+) -> Tuple[str, int]:
+    """"""
+    last_bit: str = re.search(f'_{interval}\.[0-9]+', path).group()
     num = int(re.search(f'[0-9]+', last_bit).group())
-    path_without_num = path[0:-len(str(num))]
+    path_without_num: str = path[0:-len(str(num))]
 
     return path_without_num, num
 
@@ -83,7 +84,7 @@ def _shift(snap: Snap) -> None:
         f'Shift snapshot "{snap.interval}" in {snap.backup_root}'
     ))
 
-    snaps_to_shift = [
+    snaps_to_shift: List[str] = [
         item
         for item
         in glob(f'{snap.backup_root}/*')
@@ -92,10 +93,10 @@ def _shift(snap: Snap) -> None:
 
     for path in sorted(snaps_to_shift, reverse=True):
         path_wo_num, num = _split_num_from_path(path, snap.interval)
-        search = f'{path_wo_num}{num}'
-        replacement = f'{path_wo_num}{num+1}'
+        search: str = f'{path_wo_num}{num}'
+        replacement: str = f'{path_wo_num}{num+1}'
 
-        new_path = re.sub(search, replacement, path)
+        new_path: str = re.sub(search, replacement, path)
 
         os.rename(
             src=path,
@@ -109,7 +110,7 @@ def _get_deprecated_snaps(snap: Snap) -> Union[List[SnapDir], list]:
     Dirs that contain snapshots that are older than what the user wants to keep.
     The keep range is defined in the config yaml file.
     """
-    keep_range: list = range(0, snap.keep_amount)
+    keep_range: List[int] = range(0, snap.keep_amount)
 
     snaps_to_keep: Union[List[SnapDir], list] = [
         item
@@ -142,11 +143,11 @@ def _rm_snap(dir_: Union[SnapDir, SnapDirTmp]) -> None:
     sub.check_call(['rm', '-rf', dir_])
 
 
-def _rm_deprecated_snaps(snap: Snap):
+def _rm_deprecated_snaps(snap: Snap) -> bool:
     """
     Delete deprecated snapshot directories.
     """
-    deprecated = _get_deprecated_snaps(snap)
+    deprecated: Union[List[SnapDir], list] = _get_deprecated_snaps(snap)
 
     for snap_dir in deprecated:
         log.debug(log.lvl1.ts_msg(
@@ -172,10 +173,10 @@ def _update_timestamp(snap: Snap) -> None:
         f'Update timestamp for "{snap.interval}".'
     ))
 
-    timestamp_file = clean_path(
+    timestamp_file: str = clean_path(
         f'{snap.backup_root}/{const.TIMESTAMP_FILE_NAME}'
     )
-    timestamps = load_yaml(timestamp_file, True) or {}
+    timestamps: Dict[Interval, str] = load_yaml(timestamp_file, True) or {}
 
     timestamps[snap.interval] = time.strftime(const.TIMESTAMP_FORMAT)
 
@@ -207,7 +208,7 @@ def _init_snapshot(
     return snap
 
 
-def make(
+def _make(
     interval: Interval,
     job: Job,
     timestamp: datetime,
@@ -254,7 +255,7 @@ def routine(job: Job):
     log.debug('')
 
     for interval in job.due_snapshots:
-        make(
+        _make(
             interval=interval,
             job=job,
             timestamp=timestamp,

@@ -18,18 +18,19 @@
 import time
 import threading
 import subprocess as sp
-from typing import List
+from subprocess import Popen
+from typing import List, Optional, Union
 from vhpi.utils import clean_path
 from vhpi.api.types import BackupLatest, Job, Settings
 from vhpi.api import validate
 import vhpi.api.logging as log
 
 
-def build_excludes(
+def _build_excludes(
     excludes: list,
     excl_lists: list,
     excl_lib: dict,
-):
+) -> List[str]:
     """
     """
     for _list in excl_lists:
@@ -39,7 +40,7 @@ def build_excludes(
     return ['--exclude=' + item for item in excludes]
 
 
-def build_rsync_command(
+def _build_rsync_command(
     rsync_options: str,
     backup_src: str,
     backup_latest: BackupLatest,
@@ -54,27 +55,30 @@ def build_rsync_command(
     @excl_lists: from cfg, e.g.: ['standard_list']
     @excl_lib: from cfg, e.g.: {'standard_list': ['downloads', 'tmp']}
     """
-    options = rsync_options.split()
-    excludes = build_excludes(excludes, excl_lists, excl_lib)
-    src = clean_path(backup_src)
-    dst = clean_path(backup_latest)
+    options: List[str] = rsync_options.split()
+    excludes: List[str] = _build_excludes(excludes, excl_lists, excl_lib)
+    src: str = clean_path(backup_src)
+    dst: str = clean_path(backup_latest)
 
     return ['rsync'] + options + excludes + [src, dst]
 
 
-def _terminate_sub_process(p):
+def _terminate_sub_process(p: Popen) -> None:
     if p.poll() is None:
         p.terminate()
         if p.poll() is None:
             p.kill()
 
 
-def _run_rsync_monitor(job: Job, sub_process: sp.Popen):
+def _run_rsync_monitor(
+    job: Job,
+    sub_process: Popen
+) -> Union[str, int]:
     """"""
-    duration = 1
+    duration: int = 1
 
     while True:
-        return_code = sub_process.poll()
+        return_code: Optional[int] = sub_process.poll()
 
         # break if subprocess finished naturally.
         if return_code is not None:
@@ -92,26 +96,12 @@ def _run_rsync_monitor(job: Job, sub_process: sp.Popen):
             _terminate_sub_process(sub_process)
             return 'no_dst'
 
-        duration = 60 if duration > 60 else duration * 2
+        duration: int = 60 if duration > 60 else duration * 2
 
         time.sleep(duration)
 
 
-def matching_lines(self, level, needle, lines):
-    """Filter a multi-line string for words.
-    Each line that contains a certain word will be logged.
-    Can be used on the output of rsync to log each line with an 'error' or
-    'warning'.
-    """
-    lines = lines.splitlines()
-    matches = ['    ' + level.title() + ': ' + s
-               for s in lines if needle in s]
-    matches_str = '\n'.join(matches)
-    dynamic_func = getattr(self.logger, level)
-    dynamic_func(matches_str) if len(matches) > 0 else None
-
-
-def _log_line(line):
+def _log_line(line: str) -> None:
     line = line.replace('\n', '')
 
     if 'error:' in line:
@@ -130,7 +120,7 @@ def _log_line(line):
         log.debug(f'    {line}')
 
 
-def _log_job_out_rsync_failed(init_time):
+def _log_job_out_rsync_failed(init_time: float) -> None:
     log.lvl0.job_out_info(
         message='Rsync Execution Failed.',
         skipped=True,
@@ -138,7 +128,10 @@ def _log_job_out_rsync_failed(init_time):
     )
 
 
-def handle_monitor_result(result, init_time):
+def handle_monitor_result(
+    result: Union[str, int],
+    init_time: float
+) -> bool:
     if result == 'source_offline':
         log.error(log.lvl1.ts_msg('Error: Source machine went offline'))
         _log_job_out_rsync_failed(init_time)
@@ -157,7 +150,11 @@ def handle_monitor_result(result, init_time):
     return True
 
 
-def _handle_rsync_return_codes(return_code, init_time):
+def _handle_rsync_return_codes(
+    return_code: Union[str, int],
+    init_time: float
+) -> bool:
+    """"""
     if return_code == 20:
         log.error(log.lvl1.ts_msg('Error Code 20: Source machine went offline'))
         _log_job_out_rsync_failed(init_time)
@@ -166,12 +163,12 @@ def _handle_rsync_return_codes(return_code, init_time):
     return True
 
 
-def _rsync_output(p):
+def _rsync_output(p: Popen) -> None:
     for line in p.stdout:
         _log_line(line)
 
 
-def _async_log_subprocess_output(p):
+def _async_log_subprocess_output(p: Popen) -> None:
     output_stream = threading.Thread(
         target=_rsync_output,
         args=(p,)
@@ -183,9 +180,9 @@ def _async_log_subprocess_output(p):
 def exec_rsync(
     job: Job,
     settings: Settings
-):
+) -> bool:
     """"""
-    rsync_command = build_rsync_command(
+    rsync_command: List[str] = _build_rsync_command(
         rsync_options=job.rsync_options,
         backup_src=job.backup_src,
         backup_latest=job.backup_latest,
@@ -202,7 +199,7 @@ def exec_rsync(
         log.debug('    Executing: ' + ' '.join(rsync_command))
         log.debug('')
 
-        p = sp.Popen(
+        p = Popen(
             rsync_command,
             shell=False,
             stdin=sp.PIPE,
@@ -214,7 +211,7 @@ def exec_rsync(
 
         _async_log_subprocess_output(p)
 
-        monitor_result = _run_rsync_monitor(job, p)
+        monitor_result: Union[str, int] = _run_rsync_monitor(job, p)
 
         if not handle_monitor_result(
             result=monitor_result,
@@ -236,6 +233,7 @@ def exec_rsync(
         log.debug(e)
 
         _log_job_out_rsync_failed(job.init_time)
+
         return False
 
     log.debug('')
