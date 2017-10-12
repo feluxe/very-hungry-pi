@@ -21,7 +21,7 @@
 - [x] Provide a simple command line interface to run vhpi. (see `vhpi --help`)
 - [x] Fix a bunch of bugs.
 - [x] Improve test strategy.
-- [x] Tutorial on how to install Python3.x from source/. (see wiki)
+- [x] Tutorial on how to install Python3.x from source. (see wiki)
 - [x] Tutorial on how to share sources with the pi via NFS. (see wiki)
 - [x] Use AGPL (license).
 
