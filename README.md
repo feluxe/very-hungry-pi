@@ -1,6 +1,12 @@
 # Very Hungry Pi
 <img src="assets/slideshow.gif" alt="slideshow" />
 
+## News: Version 2 (beta) released.
+
+I'm happy to announce Version 2 (beta) of *vhpi*.
+It's an entire rewrite. There is a `vhpi` package now on [pypi](https://pypi.python.org/pypi/vhpi) and a simple command line interface to run *vhpi* more conveniently. See CHANGELOG.md for more info.
+There are some minor breaking Changes in the config. The most important thing to notice, if you upgrade from v1 to v2, is that the snapshot directories have a new naming conventions. `monthly.1` would now be `2017-10-11__02:07:03__monthly.1`. The timestamp is the moment the backup finished. If you want to keep your snapshots, you should adjust their names accordingly.  
+
 ## Contents
 * [Description](#description)
 * [Features](#features)
@@ -16,7 +22,6 @@ With **vhpi** you can turn your Raspberry Pi into a silent backup module for you
 To get the most control over the backups *vhpi* takes raw [rsync options](http://linux.die.net/man/1/rsync) for configuration.
 *Vhpi* writes two log files: one for a short overview of the entire process ([info.log exmpl.](vhpi/examples/info.log)) and one for debugging ([debug.log exmpl.](vhpi/examples/debug.log)).
 
-More details about the script in the wiki: ['What the script does in detail'](https://github.com/feluxe/very_hungry_pi/wiki/What-the-script-does-in-detail).
 
 **TL;DR:** Just setup *vhpi*, run your Pi 24/7 and don't care about backups no more.
 <br>
