@@ -158,7 +158,7 @@ The results of each run is written to the log-files as well (`~/.config/vhpi/deb
 
 ### <a name="create_cronjob"></a> Create a Cronjob
 
-You can run *vhpi* manually with this command `vhpi run`, but I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run *vhpi*.
+You can run *vhpi* manually with this command `vhpi run`, but I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run *vhpi*.)
 
 ```
 @hourly         username   vhpi run
