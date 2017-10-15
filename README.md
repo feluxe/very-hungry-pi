@@ -147,7 +147,7 @@ When you run *vhpi* for the first time, it creates a config dir at `~/.config/vh
 
 ### Test the configuration 
 
-In order to test *vhpi* I suggest setting up some dummy backup sources that point to some safe destinations. Maybe in the `/tmp` dir or so. Then just run the following command a couple of times and see if the destination gets filled with backups/snapshots:
+In order to test *vhpi* I suggest setting up some dummy backup sources that point to some safe destinations. Maybe in the `/tmp` dir or so. Then run the following command a couple of times and see if the destination gets filled with backups/snapshots:
 
  ```
  $ vhpi run
