@@ -46,6 +46,72 @@ To get the most control over the backups *vhpi* takes raw [rsync options](http:/
 * You need Python >= 3.6 on your Pi for *vhpi* to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
 * The file system of your Backup destination has to support hard links. (most common fs like NTFS and ext do...)
 
+## <a name="install"></a> Installation & Configuration
+
+
+### Sharing sources with the Pi:
+
+Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba`. Perhaps *vhpi* can create local backups as well.
+
+You should use `autofs` or similar to automatically mount the shared directories with your Pi whenever they are available. This way your Pi will automatically mount the directories whenever a machine enters the network.
+
+There is a tutorial on this in the wiki: [How to share sources with your Raspberry Pi using NFS.](https://github.com/feluxe/very_hungry_pi/wiki/How-to-share-sources-with-your-Raspberry-Pi-using-NFS.)
+
+
+### Download and Install:
+
+Simplest way to install *vhpi* is by useing pip. You need Python3.6 for *vhpi* to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
+After you installed Python3.6 you can run pip to install *vhpi* like this:
+```
+$ pip3.6 install vhpi
+```
+
+Run this command to check if *vhpi* was isntalled successfully:
+
+```
+$ vhpi --help
+```
+It should print the help text to the terminal.
+
+
+### Configure vhpi:
+
+When you run *vhpi* for the first time, it creates a config dir at `~/.config/vhpi/`, you'll find a file called `vhpi_cfg.yaml` there. This is where you configure your backups. The config file is pretty self explanatory, just have a look at the [Example Config](#example_config)
+
+
+### Test the configuration 
+
+In order to test *vhpi* I suggest setting up some dummy backup sources that point to some safe destinations. Maybe in the `/tmp` dir or so. Then run the following command a couple of times and see if the destination gets filled with backups/snapshots:
+
+ ```
+ $ vhpi run
+ ```
+ 
+If you get an error try to adjust the config. If you think there is a bug feel free to use the [github issue tracker](https://github.com/feluxe/very_hungry_pi/issues)!
+The results of each run is written to the log-files as well (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
+
+### <a name="create_cronjob"></a> Create a Cronjob
+
+You can run *vhpi* manually with this command `vhpi run`, but I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run *vhpi*.)
+
+```
+@hourly         username   vhpi run
+```
+
+If want to set the cronjob to something else than *hourly*, you might want to read this: [Choosing an interval for the cornjob.](https://github.com/feluxe/very_hungry_pi/wiki/Choosing-an-interval-for-the-cronjob.)
+
+You can also add multiple cronjobs that execute *vhpi* in different intervals for different users.
+
+After you added the cronjob, you should restart your Pi or restart the crontab like this:
+
+```
+$ /etc/init.d/cron restart
+```
+
+If this is all done, your Pi should run *vhpi* every hour and you should see some activity in the log files and of cause on your hard drive. Yay! :D
+
+
+
 ## <a name="example_config"></a> Example Config
 
 #### `~/.config/vhpi/vhpi_cfg.yaml`
@@ -112,67 +178,3 @@ jobs:
   # etc...'
  ```
  
-## <a name="install"></a> Installation & Configuration
-
-
-### Sharing sources with the Pi:
-
-Your Pi needs access to the directories of each client that you want to backup. Just share/export them with `NFS` or `Samba`. Perhaps *vhpi* can create local backups as well.
-
-You should use `autofs` or similar to automatically mount the shared directories with your Pi whenever they are available. This way your Pi will automatically mount the directories whenever a machine enters the network.
-
-There is a tutorial on this in the wiki: [How to share sources with your Raspberry Pi using NFS.](https://github.com/feluxe/very_hungry_pi/wiki/How-to-share-sources-with-your-Raspberry-Pi-using-NFS.)
-
-
-### Download and Install:
-
-Simplest way to install *vhpi* is by useing pip. You need Python3.6 for *vhpi* to run. ([How to install Python3.x on your Pi](https://github.com/feluxe/very_hungry_pi/wiki/Install-Python3.X-from-source-on-a-Raspberry-Pi-(Raspbian)))
-After you installed Python3.6 you can run pip to install *vhpi* like this:
-```
-$ pip3.6 install vhpi
-```
-
-Run this command to check if *vhpi* was isntalled successfully:
-
-```
-$ vhpi --help
-```
-It should print the help text to the terminal.
-
-
-### Configure vhpi:
-
-When you run *vhpi* for the first time, it creates a config dir at `~/.config/vhpi/`, you'll find a file called `vhpi_cfg.yaml` there. This is where you configure your backups. The config file is pretty self explanatory, just have a look at the [Example Config](#example_config)
-
-
-### Test the configuration 
-
-In order to test *vhpi* I suggest setting up some dummy backup sources that point to some safe destinations. Maybe in the `/tmp` dir or so. Then run the following command a couple of times and see if the destination gets filled with backups/snapshots:
-
- ```
- $ vhpi run
- ```
- 
-If you get an error try to adjust the config. If you think there is a bug feel free to use the [github issue tracker](https://github.com/feluxe/very_hungry_pi/issues)!
-The results of each run is written to the log-files as well (`~/.config/vhpi/debug.log` and `~/.config/vhpi/info.log`)
-
-### <a name="create_cronjob"></a> Create a Cronjob
-
-You can run *vhpi* manually with this command `vhpi run`, but I suggest creating a cronjob that runs *vhpi* automatically every hour. To do so you can add the following line to `/etc/crontab`. (Replace `username` with the username that is supposed to run *vhpi*.)
-
-```
-@hourly         username   vhpi run
-```
-
-If want to set the cronjob to something else than *hourly*, you might want to read this: [Choosing an interval for the cornjob.](https://github.com/feluxe/very_hungry_pi/wiki/Choosing-an-interval-for-the-cronjob.)
-
-You can also add multiple cronjobs that execute *vhpi* in different intervals for different users.
-
-After you added the cronjob, you should restart your Pi or restart the crontab like this:
-
-```
-$ /etc/init.d/cron restart
-```
-
-If this is all done, your Pi should run *vhpi* every hour and you should see some activity in the log files and of cause on your hard drive. Yay! :D
-
