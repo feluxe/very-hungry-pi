@@ -154,7 +154,7 @@ def _cfg_no_absolute_path_error(item: str) -> None:
 
 def _cfg_dst_not_exists_error(item: str) -> None:
     error(
-        f'[Error] Invalid config. Destination does not exist: "{item}".'
+        f'[Error] Backup destination does not exist: "{item}".'
     )
 
 
