@@ -1,9 +1,0 @@
-buildlib==0.0.0a20
-cmdinter==0.0.0a13
-docopt==0.6.2
-headlines==0.0.0a5
-prmt==0.0.0a8
-processy==0.0.0a5
-py==1.4.34
-pytest==3.2.3
-ruamel.yaml==0.15.34

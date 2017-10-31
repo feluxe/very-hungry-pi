@@ -44,7 +44,7 @@ def publish() -> None:
     if should_run_build_file:
         results.append(
             build.run_build_file(
-                build_file='build.py'
+                build_file='scripts/build.py'
             )
         )
 

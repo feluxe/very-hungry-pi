@@ -21,7 +21,7 @@ def build_sequence() -> None:
 
     print(h3('Build Results'))
     for command in result:
-        print(command.return_msg)
+        print(command.summary)
 
 
 def execute() -> None:
