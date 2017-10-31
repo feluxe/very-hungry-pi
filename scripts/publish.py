@@ -111,7 +111,7 @@ def publish() -> None:
     print(h3('Publish Results'))
 
     for i, result in enumerate(results):
-        print(result.return_msg)
+        print(result.summary)
 
 
 if __name__ == '__main__':
