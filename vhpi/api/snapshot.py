@@ -150,10 +150,6 @@ def _rm_deprecated_snaps(snap: Snap) -> bool:
     deprecated: Union[List[SnapDir], list] = _get_deprecated_snaps(snap)
 
     for snap_dir in deprecated:
-        log.debug(log.lvl1.ts_msg(
-            f'Deleting deprecated snapshot: {snap_dir}'
-        ))
-
         try:
             _rm_snap(str(snap_dir))
 
