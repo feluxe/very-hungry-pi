@@ -1,7 +1,7 @@
 import pypandoc
 from setuptools import setup, find_packages
-from buildlib.utils.yaml import load_yaml
 from codecs import open
+import ruamel.yaml as yaml
 
 try:
     long_description = pypandoc.convert('README.md', 'rst')
@@ -9,7 +9,11 @@ try:
 except(IOError, ImportError):
     long_description = open('README.md').read()
 
-config = load_yaml('CONFIG.yaml')
+config = {}
+
+with open('Project', 'r') as stream:
+    config = yaml.safe_load(stream.read())
+
 
 setup(
     name=config['proj_pypi_name'],
@@ -29,7 +33,8 @@ setup(
     platforms=config['pypi']['platforms'],
     classifiers=config['pypi']['classifiers'],
     install_requires=config['pypi']['install_requires'],
-    packages=find_packages(where='.', exclude=('tests', 'tests.*', 'venv-vhpi', 'venv-vhpi.*')),
+    packages=find_packages(where='.', exclude=(
+    'tests', 'tests.*', 'venv-vhpi', 'venv-vhpi.*')),
     package_dir=config['pypi']['package_dir'],
     package_data=config['pypi']['package_data'],
     data_files=config['pypi']['data_files'],

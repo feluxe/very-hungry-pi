@@ -1,9 +1,7 @@
 "proj_name_literal": "Very Hungry Pi"
 "proj_name_computable": "vhpi"
-
 "proj_pypi_name": "vhpi"
 "proj_package_name": "vhpi"
-
 "github_repo_name": "very_hungry_pi"
 "version": "2.0.0-beta.12"
 "license": "AGPLv3"
@@ -15,10 +13,8 @@
 "description": "Turn your Raspberry Pi into an independent backup module for your\
   \ network. "
 "keywords": ["raspberry-pi", " backup", " snapshot"]
-
-
 "interpreter": "python3.6"
-"gemfury_env": "python"
+"registry": "pypi"
 "pypi":
   "install_requires": ["docopt"]
   "packages": ["vhpi"]
@@ -30,6 +26,6 @@
   "platforms": ""
   "entry_points": {"console_scripts": ["vhpi = vhpi.main:execute"], "gui_scripts": []
 }
-  "tests_require": ["wheel", " buildlib", " pytest", "pypandoc"]
+  "tests_require": ["wheel", "ruaml.yaml", " pytest", "pypandoc"]
 
 

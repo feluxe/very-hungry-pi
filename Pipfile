@@ -13,9 +13,9 @@ docopt = "*"
 [dev-packages]
 
 wheel = "*"
-buildlib = "*"
 pytest = "*"
 pypandoc = "*"
+"ruamel.yaml" = "*"
 
 
 [requires]
