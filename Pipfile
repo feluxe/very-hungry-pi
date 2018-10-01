@@ -1,23 +1,18 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
 
+[dev-packages]
+buildlib = "==2.0.4"
+yapf = "*"
+pylint = "*"
 docopt = "*"
 
-
-[dev-packages]
-
-wheel = "*"
-pytest = "*"
-pypandoc = "*"
-"ruamel.yaml" = "*"
-
-
 [requires]
-
 python_version = "3.6"
+
+[pipenv]
+allow_prereleases = true

@@ -1,30 +1,30 @@
 
 
-
-
-### Misc. ###
-INFO.fmw.md
+### Misc
 .cache/
 
-### Python ###
+
+### Python
 __pycache__/
 .env
 *.pyc
 venv-vhpi/
 
-### Wheels ###
+
+### Wheels
 build/
 dist/
 vhpi.egg-info/
 
-### Intellij ###
+
+### Editors
 *.iml
 .idea/
-
-### Vim ###
 .swp
+.vscode
 
-### testing ###
+
+### testing
 tests/mock/backup_root/
 **/tmp/*
 tests/debug.log

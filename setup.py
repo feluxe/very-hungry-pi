@@ -1,19 +1,9 @@
-import pypandoc
 from setuptools import setup, find_packages
 from codecs import open
-import ruamel.yaml as yaml
+from buildlib import yaml
 
-try:
-    long_description = pypandoc.convert('README.md', 'rst')
-
-except(IOError, ImportError):
-    long_description = open('README.md').read()
-
-config = {}
-
-with open('Project', 'r') as stream:
-    config = yaml.safe_load(stream.read())
-
+config = yaml.loadfile('Project')
+long_description = open('README.md').read()
 
 setup(
     name=config['proj_pypi_name'],
@@ -25,19 +15,18 @@ setup(
     url=config['url'],
     description=config['description'],
     long_description=long_description,
+    long_description_content_type="text/markdown",
     download_url=config['url'] + '/tarball/' + config['version'],
     license=config['license'],
     keywords=config['keywords'],
-
     include_package_data=True,
     platforms=config['pypi']['platforms'],
     classifiers=config['pypi']['classifiers'],
     install_requires=config['pypi']['install_requires'],
-    packages=find_packages(where='.', exclude=(
-    'tests', 'tests.*', 'venv-vhpi', 'venv-vhpi.*')),
+    packages=find_packages(
+        where='.', exclude=('tests', 'tests.*', 'venv-vhpi', 'venv-vhpi.*')),
     package_dir=config['pypi']['package_dir'],
     package_data=config['pypi']['package_data'],
     data_files=config['pypi']['data_files'],
     entry_points=config['pypi']['entry_points'],
-    tests_require=config['pypi']['tests_require']
-)
+    tests_require=config['pypi']['tests_require'])
