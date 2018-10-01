@@ -15,7 +15,7 @@ keywords: [raspberry-pi, ' backup', ' snapshot']
 interpreter: python3.6
 registry: pypi
 pypi:
-  install_requires: [docopt]
+  install_requires: [docopt, oyaml]
   packages: [vhpi]
   package_dir: {vhpi: vhpi}
   package_data:

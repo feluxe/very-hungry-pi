@@ -172,7 +172,7 @@ def _update_timestamp(snap: Snap) -> None:
     timestamp_file: str = clean_path(
         f'{snap.backup_root}/{const.TIMESTAMP_FILE_NAME}'
     )
-    timestamps: Dict[Interval, str] = load_yaml(timestamp_file, True) or {}
+    timestamps: Dict[Interval, str] = load_yaml(timestamp_file) or {}
 
     timestamps[snap.interval] = time.strftime(const.TIMESTAMP_FORMAT)
 

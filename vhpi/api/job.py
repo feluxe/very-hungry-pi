@@ -98,7 +98,7 @@ def _load_timestamps(
     if not os.path.isfile(timestamp_file):
         open(timestamp_file, 'a').close()
 
-    timestamps: Dict[Interval, str] = load_yaml(timestamp_file, True) or {}
+    timestamps: Dict[Interval, str] = load_yaml(timestamp_file) or {}
 
     for interval in intervals:
         if not timestamps.get(interval):

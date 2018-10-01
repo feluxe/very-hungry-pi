@@ -17,7 +17,7 @@
 
 import os
 import sys
-import ruamel.yaml as yaml
+import oyaml as yaml
 from typing import Any
 
 
@@ -41,31 +41,20 @@ def check_path(path):
             return False
 
 
-def load_yaml(
-    file: str,
-    keep_order: bool = False
-) -> dict:
+def load_yaml(file: str) -> dict:
     """
     Load yaml file.
     """
-    with open(file, 'r') as stream:
-        if keep_order:
-            return yaml.load(stream, Loader=yaml.RoundTripLoader)
-        else:
-            return yaml.safe_load(stream)
+    with open(file, 'r') as f:
+        return yaml.safe_load(f)
 
 
-def save_yaml(
-    data: Any,
-    file: str,
-    default_style: str = '"'
-) -> None:
+def save_yaml(data: Any, file: str, default_style: str = '"') -> None:
     """
     Save data to yaml file.
     """
     with open(file, 'w') as yaml_file:
-        yaml.dump(data, yaml_file, Dumper=yaml.RoundTripDumper,
-                  default_style=default_style)
+        yaml.dump(data, yaml_file, default_style=default_style)
 
 
 def eprint(*objects, sep=' ', end='\n', file=sys.stderr, flush=False) -> None:

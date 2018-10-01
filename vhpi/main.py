@@ -18,7 +18,7 @@
 import os
 from vhpi import cli, exceptions
 import vhpi.constants as const
-import ruamel.yaml as yaml
+import oyaml as yaml
 import vhpi.api.logging as log
 
 
@@ -27,8 +27,8 @@ def load_user_cfg():
     Load default user cfg files.
     """
     if os.path.isfile(const.USER_CFG_FILE):
-        with open(const.USER_CFG_FILE, 'r') as file:
-            return yaml.load(file, Loader=yaml.RoundTripLoader) or {}
+        with open(const.USER_CFG_FILE, 'r') as f:
+            return yaml.safe_load(f) or {}
 
     else:
         return {}
@@ -38,10 +38,7 @@ def execute() -> None:
     """"""
     log.init(const.APP_CFG_DIR)
 
-    exceptions.handler(
-        func=cli.render,
-        kwargs={'cfg': load_user_cfg()}
-    )
+    exceptions.handler(func=cli.render, kwargs={'cfg': load_user_cfg()})
 
 
 if __name__ == '__main__':
