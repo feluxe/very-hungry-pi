@@ -1,3 +1,5 @@
+import shutil
+import os
 import subprocess as sp
 from cmdi import print_summary
 from buildlib import buildmisc, git, wheel, project, yaml
@@ -11,10 +13,14 @@ interface = """
     Usage:
         make.py build [options]
         make.py deploy [options]
-        make.py test [options]
+        make.py test <cmd> [options]
         make.py bump [options]
         make.py git [options]
         make.py -h | --help
+
+    Commands:
+        test <cmd>           <cmd> can be 'init' or 'run'. 'init' creates a test
+                             directory and 'run' runs the tests.
 
     Options:
     -h, --help               Show this screen.
@@ -36,9 +42,16 @@ def deploy(cfg: Cfg):
     return wheel.cmd.push(clean_dir=True, repository=cfg.registry)
 
 
-def test(cfg: Cfg):
-    print('Not implemented.')
-    # sp.run(['python3.5', '-m', 'tests'])
+def test(cfg: Cfg, cmd: str):
+
+    if cmd == 'init':
+        shutil.rmtree('/tmp/vhpi/', ignore_errors=True)
+        os.makedirs('/tmp/vhpi/')
+        shutil.copytree(src='tests', dst='/tmp/vhpi/tests')
+        print('Created test directory at: /tmp/vhpi/tests')
+
+    elif cmd == 'run':
+        sp.run(['python', '-m', 'vhpi.main', 'run', '-c', '/tmp/vhpi/tests'])
 
 
 def bump(cfg: Cfg):
@@ -73,7 +86,7 @@ def run():
         results.append(deploy(cfg))
 
     if uinput['test']:
-        test(cfg)
+        test(cfg, uinput['<cmd>'])
 
     if uinput['git']:
         results.append(git.seq.bump_git(cfg.version, new_release=False))
