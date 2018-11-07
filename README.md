@@ -1,5 +1,6 @@
 # Very Hungry Pi
-<img src="assets/slideshow.gif" alt="slideshow" />
+<img src="assets/slideshow/slideshow.gif" alt="slideshow" />
+
 
 ## News
 
