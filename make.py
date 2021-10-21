@@ -1,40 +1,41 @@
-import shutil
 import os
+import shutil
 import subprocess as sp
+
+from buildlib import buildmisc, git, project, wheel, yaml_
 from cmdi import print_summary
-from buildlib import buildmisc, git, wheel, project, yaml
 from docopt import docopt
 
 interface = """
-    Install:
-        pipenv install --dev --pre
-        pipenv run python make.py
+Install:
+    pipenv install --dev --pre
+    pipenv run python make.py
 
-    Usage:
-        make.py build [options]
-        make.py deploy [options]
-        make.py test <cmd> [options]
-        make.py bump [options]
-        make.py git [options]
-        make.py -h | --help
+Usage:
+    make.py build [options]
+    make.py deploy [options]
+    make.py test <cmd> [options]
+    make.py bump [options]
+    make.py git [options]
+    make.py -h | --help
 
-    Commands:
-        test <cmd>           <cmd> can be 'init' or 'run'. 'init' creates a test
-                             directory and 'run' runs the tests.
+Commands:
+    test <cmd>           <cmd> can be 'init' or 'run'. 'init' creates a test
+                            directory and 'run' runs the tests.
 
-    Options:
-    -h, --help               Show this screen.
+Options:
+-h, --help               Show this screen.
 """
 
-proj = yaml.loadfile('Project')
+proj = yaml_.loadfile("Project")
 
 
 class Cfg:
-    version = proj['version']
-    registry = 'pypi'
+    version = proj["version"]
+    registry = "pypi"
 
 
-def build(cfg: Cfg):
+def build():
     return wheel.cmd.build(clean_dir=True)
 
 
@@ -44,14 +45,14 @@ def deploy(cfg: Cfg):
 
 def test(cfg: Cfg, cmd: str):
 
-    if cmd == 'init':
-        shutil.rmtree('/tmp/vhpi/', ignore_errors=True)
-        os.makedirs('/tmp/vhpi/')
-        shutil.copytree(src='tests', dst='/tmp/vhpi/tests')
-        print('Created test directory at: /tmp/vhpi/tests')
+    if cmd == "init":
+        shutil.rmtree("/tmp/vhpi/", ignore_errors=True)
+        os.makedirs("/tmp/vhpi/")
+        shutil.copytree(src="tests", dst="/tmp/vhpi/tests")
+        print("Created test directory at: /tmp/vhpi/tests")
 
-    elif cmd == 'run':
-        sp.run(['python', '-m', 'vhpi.main', 'run', '-c', '/tmp/vhpi/tests'])
+    elif cmd == "run":
+        sp.run(['python', '-m', 'vhpi.app', 'run', '--config-dir', '/tmp/vhpi/tests'])
 
 
 def bump(cfg: Cfg):
@@ -63,10 +64,10 @@ def bump(cfg: Cfg):
         cfg.version = result.val
         results.append(result)
 
-    if wheel.prompt.should_push('PYPI'):
+    if wheel.prompt.should_push("PYPI"):
         results.append(deploy(cfg))
 
-    new_release = cfg.version != proj['version']
+    new_release = cfg.version != proj["version"]
 
     results.extend(git.seq.bump_git(cfg.version, new_release))
 
@@ -79,26 +80,26 @@ def run():
     uinput = docopt(interface)
     results = []
 
-    if uinput['build']:
+    if uinput["build"]:
         results.append(build(cfg))
 
-    if uinput['deploy']:
+    if uinput["deploy"]:
         results.append(deploy(cfg))
 
-    if uinput['test']:
-        test(cfg, uinput['<cmd>'])
+    if uinput["test"]:
+        test(cfg, uinput["<cmd>"])
 
-    if uinput['git']:
+    if uinput["git"]:
         results.append(git.seq.bump_git(cfg.version, new_release=False))
 
-    if uinput['bump']:
+    if uinput["bump"]:
         results.extend(bump(cfg))
 
     print_summary(results)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         run()
     except KeyboardInterrupt:
-        print('\n\nScript aborted by user.')
+        print("\n\nScript aborted by user.")

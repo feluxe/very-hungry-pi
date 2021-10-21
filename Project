@@ -26,6 +26,6 @@ pypi:
   classifiers: []
   platforms: ''
   entry_points:
-    console_scripts: ['vhpi = vhpi.main:execute']
+    console_scripts: ['vhpi = vhpi.app:startup']
     gui_scripts: []
   tests_require: [wheel, ruaml.yaml, ' pytest', pypandoc]
