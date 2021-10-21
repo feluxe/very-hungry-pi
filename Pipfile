@@ -4,15 +4,19 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+docopt = "*"
+cryptography = "==35.0.0"
 
 [dev-packages]
-buildlib = "==2.0.4"
-yapf = "*"
+black = "*"
 pylint = "*"
-docopt = "*"
+mypy = "*"
+nuitka = "==0.6.17.3"
+buildlib = "==3.0.2"
+types-setuptools = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.9"
 
 [pipenv]
 allow_prereleases = true
